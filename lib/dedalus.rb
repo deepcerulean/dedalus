@@ -12,6 +12,7 @@ module Dedalus
   end
 
   class Atom < Element
+    attr_accessor :scale
   end
 
   class Molecule < Element
@@ -31,6 +32,25 @@ module Dedalus
   end
 
   module Elements
+    class Icon < Dedalus::Atom
+      attr_accessor :image #, :layer
+      after_create { self.scale ||= 0.0618 }
+
+      def render(screen)
+        x,y = *position
+        p [ :draw_image, pos: [x,y], img: image ]
+        image.draw(x, y, ZOrder::Foreground, scale, scale)
+      end
+
+      class << self
+        def for(sym)
+          @icon_set ||= {}
+          @icon_set[sym] ||= create(image: Gosu::Image.new("media/icons/#{sym}.png"))
+          @icon_set[sym]
+        end
+      end
+    end
+
     class Heading < Dedalus::Atom
       attr_accessor :text, :scale
       after_create { self.scale ||= 1.0 }
@@ -41,6 +61,16 @@ module Dedalus
       #     screen.text_width(text)
       #   ]
       # end
+
+      def render(screen)
+        x,y = *position
+        screen.font.draw(text, 20 + x, 20 + y, ZOrder::Text, self.scale, self.scale)
+      end
+    end
+
+    class Paragraph < Dedalus::Atom
+      attr_accessor :text, :scale
+      after_create { self.scale ||= 0.5 }
 
       def render(screen)
         x,y = *position
@@ -61,15 +91,13 @@ module Dedalus
     end
 
     def render!(structure, origin: [0,0], dimensions: window_dimensions)
-      puts "--- called compose!"
-      # structure = element.show
-      p  origin: origin, dimensions: dimensions, structure: structure
+      # puts "--- called render!"
+      # # structure = element.show
 
       width, height = *dimensions
       x0, y0 = *origin
 
       if structure.is_a?(Dedalus::Atom)
-        p rendering_atom: structure
 
         structure.update(position: origin)
         structure.render(app_view)
@@ -81,37 +109,44 @@ module Dedalus
       elsif structure.is_a?(Array) # we have a set of rows
         rows_with_height_hints = structure.select do |row| 
           if row.is_a?(Array)
-            row.any? { |col| !col.height.nil? }
+            false #row.any? { |col| !col.height.nil? }
           else
             !row.height.nil? 
           end
         end
-        height_specified_by_hints = rows_with_height_hints.sum(&:height) * height
+
+        height_specified_by_hints = rows_with_height_hints.sum(&:height) * height.to_f
         height_cursor = 0
 
-        row_section_height = (height - height_specified_by_hints) / (structure.length)
+        row_section_height = (height - height_specified_by_hints) / (structure.length - rows_with_height_hints.length) #.to_f)
         structure.each_with_index do |row, y_index|
           if row.is_a?(Array) # we have columns within the row
             columns_with_height_hints = row.select do |column|
               !column.width.nil?
             end
-            width_specified_by_hints = columns_with_height_hints.sum(&:width) * width
+            width_specified_by_hints = columns_with_height_hints.sum(&:width) * width.to_f
             width_cursor = 0
 
-            column_section_width = (width - width_specified_by_hints) / (row.length)
+            column_section_width = (width - width_specified_by_hints) / (row.length - columns_with_height_hints.length) #.to_f)
             row.each_with_index do |column, x_index|
+
               current_column_width = column.width.nil? ? column_section_width : (column.width * width)
               x = x0 + width_cursor
               y = y0 + height_cursor
-              width_cursor += current_column_width
               render!(column, origin: [x,y], dimensions: [current_column_width, height])
+
+              width_cursor += current_column_width
             end
+
+            height_cursor += row_section_height
           else # no columns in the row
             current_row_height = row.height.nil? ? row_section_height : (row.height * height)
             x = x0
             y = y0 + height_cursor
+            dims = [width, current_row_height]
+            render!(row, origin: [x,y], dimensions: dims)
+
             height_cursor += current_row_height
-            render!(row, origin: [x,y], dimensions: [width, current_row_height])
           end
         end
       end
@@ -122,6 +157,10 @@ module Dedalus
     class ApplicationView < Joyce::ApplicationView
       def render
         composer.render!(welcome_screen)
+
+        cursor = Elements::Icon.for(:arrow_cursor)
+        cursor.update(position: mouse_position)
+        cursor.render(self)
       end
 
       private
@@ -159,32 +198,65 @@ module Dedalus
       end
     end
 
+    class ApplicationFooter < Dedalus::Organism
+      attr_accessor :joyce_version, :dedalus_version, :company, :copyright
+
+      def show
+        [ footer_message ]
+      end
+
+      def height
+        0.1
+      end
+
+      private
+      def footer_message
+        @footer_message ||=  Elements::Paragraph.create(text: assemble_text)
+      end
+
+      def assemble_text
+        "Powered by Dedalus v#{dedalus_version} and Joyce v#{joyce_version}. Copyright #{company} #{copyright}, all rights reserved."
+      end
+    end
+
     class LibrarySection < Dedalus::Molecule
       belongs_to :application_sidebar
       attr_accessor :name
 
       def show
-        Elements::Heading.create(text: name) 
+        Elements::Heading.create(text: name)
       end
 
       def height
-        0.03
+        0.1
       end
     end
+
 
     class ApplicationScreen < Dedalus::Template
       def layout
         [
-          page_header, [ sidebar, yield ]
+          app_header, 
+          [ sidebar, yield ],
+          app_footer
         ]
       end
 
       private
-      def page_header
-        @page_header ||= ApplicationHeader.create(
+      def app_header
+        @app_header ||= ApplicationHeader.create(
           title: 'Dedalus',
           subtitle: 'A Visual Pattern Library for Joyce',
           height: 0.1
+        )
+      end
+
+      def app_footer
+        @app_footer ||= ApplicationFooter.create(
+          joyce_version: Joyce::VERSION,
+          dedalus_version: Dedalus::VERSION,
+          company: "Deep Cerulean Simulations and Games",
+          copyright: "2015-#{Time.now.year}"
         )
       end
 
@@ -217,97 +289,4 @@ module Dedalus
       viewed_with ApplicationView
     end
   end
-
-  # class Molecule
-  # end
-
-  # class Organism
-  # end
-
-  # class Template
-  #   def assemble(*)
-  #     puts "warning: template #{self.class.name} does not override #assemble"
-  #     []
-  #   end
-  # end
-
-  # class Page
-  #   attr_reader :organisms
-
-  #   def insert(organism)
-  #     @organisms ||= []
-  #     @organisms << organism
-  #   end
-
-  #   def render(window:)
-  #     ctx = DrawingContext.new(window)
-  #     organisms.each do |organism|
-  #       organism.render
-  #     end
-  #   end
-
-  #   class DrawingContext
-  #   end
-  # end
-
-  # ###
-
-  # module Elements
-  #   class Heading < Dedalus::Atom
-  #     attr_reader :text
-
-  #     def render(context:)
-  #       x,y = *context.location
-  #       context.window.font.draw(text, x, y, 1)
-  #     end
-  #   end
-  # end
-
-  # module Compounds
-  #   # class Search < Dedalus::Molecule; end
-  #   # class Jumbotron < Dedalus::Molecule
-  #   # end
-  # end
-
-  # module Bestiary
-  #   class Jumbotron < Dedalus::Organism
-
-  #   end
-  # end
-
-  # # module Scaffolds
-  # #   class Jumbotron < Dedalus::Template
-  # #   end
-  # # end
-
-  # ###
-  # #
-
-  # module Library
-  #   class ApplicationTemplate < Dedalus::Tempalte
-  #     def hydrate(welcome_message:)
-  #       page = Page.new
-  #       page.insert(Jumbotron.new(text: welcome_message))
-  #       page
-  #     end
-  #   end
-
-  #   class ApplicationView < Joyce::ApplicationView
-  #     def render
-  #       p [ :render_app_view! ]
-  #       page = ApplicationTemplate.hydrate(application_data)
-  #       page.render
-  #     end
-
-  #     def application_data
-  #       {
-  #         welcome_message: "Hello, user!"
-  #       }
-  #     end
-  #   end
-
-  #   class Application < Joyce::Application
-  #     viewed_with ApplicationView
-  #   end
-  # end
 end
