@@ -20,6 +20,7 @@ module Dedalus
 
       if structure.is_a?(Dedalus::Atom)
 
+        p [ render_atom_at: origin, element: structure.class.name ]
         structure.update(position: origin)
         structure.render(app_view)
 
@@ -28,21 +29,36 @@ module Dedalus
         render!(structure.show, origin: origin, dimensions: dimensions)
 
       elsif structure.is_a?(Array) # we have a set of rows
-        rows_with_height_hints = structure.select do |row|
+        rows_with_percentage_height_hints = structure.select do |row|
           if row.is_a?(Array)
             false #row.any? { |col| !col.height.nil? }
           else
-            !row.height.nil?
+            # !row.height.nil? || 
+              !row.height_percent.nil?
           end
         end
 
-        height_specified_by_hints = rows_with_height_hints.sum(&:height) * height.to_f
+        rows_with_raw_height_hints = structure.select do |row|
+          if row.is_a?(Array)
+            false #row.any? { |col| !col.height.nil? }
+          else
+            !row.height.nil? # || 
+              # !row.height_percent.nil?
+          end
+        end
+
+        rows_with_height_hints = rows_with_percentage_height_hints + rows_with_raw_height_hints
+
+        height_specified_by_hints = 
+          (rows_with_percentage_height_hints.sum(&:height_percent) * height.to_f) +
+          (rows_with_raw_height_hints.sum(&:height))
+
         height_cursor = 0
 
         row_section_height = (height - height_specified_by_hints) / (structure.length - rows_with_height_hints.length) #.to_f)
         structure.each_with_index do |row, y_index|
           if row.is_a?(Array) # we have columns within the row
-            columns_with_height_hints = row.select do |column|
+            columns_with_percentage_width_hints = row.select do |column|
               if column.is_a?(Array)
                 false
               else
@@ -50,15 +66,34 @@ module Dedalus
               end
             end
 
-            width_specified_by_hints = columns_with_height_hints.sum(&:width) * width.to_f
+            columns_with_raw_width_hints = row.select do |column|
+              if column.is_a?(Array)
+                false 
+              else
+                !column.width.nil?
+              end
+            end
+
+            columns_with_width_hints = columns_with_percentage_width_hints + columns_with_raw_width_hints
+
+            width_specified_by_hints = 
+              (columns_with_percentage_width_hints.sum(&:width_percent) * width.to_f) +
+              (columns_with_raw_width_hints.sum(&:width))
+
             width_cursor = 0
 
-            column_section_width = (width - width_specified_by_hints) / (row.length - columns_with_height_hints.length) #.to_f)
+            column_section_width = (width - width_specified_by_hints) / (row.length - columns_with_width_hints.length)
             row.each_with_index do |column, x_index|
               if column.is_a?(Array) # we have rows INSIDE the columns! i think we need to recurse...
                 render!(column, origin: [x0,y0], dimensions: [column_section_width, row_section_height])
               else
-                current_column_width = column.width.nil? ? column_section_width : (column.width * width)
+                current_column_width = if !column.width.nil? 
+                                         column.width
+                                       elsif !column.width_percent.nil?
+                                         column.width_percent * width
+                                       else
+                                         column_section_width 
+                                       end
                 x = x0 + width_cursor
                 y = y0 + height_cursor
                 render!(column, origin: [x,y], dimensions: [current_column_width, height])
@@ -69,7 +104,13 @@ module Dedalus
 
             height_cursor += row_section_height
           else # no columns in the row
-            current_row_height = row.height.nil? ? row_section_height : (row.height * height)
+            current_row_height = if !row.height.nil? 
+                                   row.height
+                                 elsif !row.height_percent.nil?
+                                   row.height_percent * height
+                                 else
+                                   row_section_height 
+                                 end
             x = x0
             y = y0 + height_cursor
             dims = [width, current_row_height]

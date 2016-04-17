@@ -55,7 +55,7 @@ module Dedalus
         [ footer_message ]
       end
 
-      def height
+      def height_percent
         0.1
       end
 
@@ -75,13 +75,26 @@ module Dedalus
 
       def show
         [[
-          Elements::Icon.for(icon), 
-          [ Elements::Heading.create(text: name), Elements::Paragraph.create(text: description) ]
+          icon_element, [ title_element,
+                          description_element ]
         ]]
       end
 
-      def height
-        0.1
+      def height_percent
+        0.2
+      end
+
+      private
+      def icon_element
+        @icon_element ||= Elements::Icon.for(icon)
+      end
+
+      def title_element
+        @title ||= Elements::Heading.create(text: name)
+      end
+
+      def description_element
+        @notes ||= Elements::Paragraph.create(text: description)
       end
     end
 
@@ -99,7 +112,7 @@ module Dedalus
         @app_header ||= ApplicationHeader.create(
           title: 'Dedalus',
           subtitle: 'A Visual Pattern Library for Joyce',
-          height: 0.1
+          height_percent: 0.10
         )
       end
 
@@ -109,7 +122,7 @@ module Dedalus
           dedalus_version: Dedalus::VERSION,
           company: "Deep Cerulean Simulations and Games",
           copyright: "2015-#{Time.now.year}",
-          height: 0.1
+          height_percent: 0.10
         )
       end
 
@@ -118,12 +131,12 @@ module Dedalus
           library_sections: [
             # LibrarySection.create(name: "Home"),
             LibrarySection.create(name: "Atoms", icon: :atom, description: "Minimal elements which can't be split further"),
-            # LibrarySection.create(name: "Molecules"),
-            # LibrarySection.create(name: "Organisms"),
-            # LibrarySection.create(name: "Templates"),
+            LibrarySection.create(name: "Molecules", icon: :molecule, description: "Simple compounds of a few atoms"),
+            LibrarySection.create(name: "Organisms", icon: :paramecium, description: "Highly-complex assemblages of molecules"),
+            LibrarySection.create(name: "Templates", icon: :hive, description: "Composed app screens with placeholder data"),
             # LibrarySection.create(name: "Screens")
           ],
-          width: 0.3
+          width_percent: 0.30
         )
       end
     end

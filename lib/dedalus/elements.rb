@@ -4,7 +4,11 @@ module Dedalus
     attr_accessor :position
 
     # in % as 0.0-1.0 (hint to compositing engine for elements in columns/rows respectively)
+    attr_accessor :width_percent, :height_percent
+
+    # raw width/height
     attr_accessor :width, :height
+
   end
 
   class Atom < Element
@@ -33,9 +37,19 @@ module Dedalus
 
       def render(screen)
         x,y = *position
+        p [ drawing_image_at: [x,y]]
         asset.draw(x, y, ZOrder::Foreground, scale, scale)
       end
 
+      def width
+        asset.width # * scale
+      end
+
+      def height
+        asset.height # * scale
+      end
+
+      private
       def asset
         @asset ||= Gosu::Image.new(path)
       end
