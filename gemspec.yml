@@ -7,7 +7,7 @@ email: jweissman1986@gmail.com
 homepage: https://rubygems.org/gems/dedalus
 
 dependencies:
-  geometer: ~> 0.1
+  # TODO joyce gem...
 
 development_dependencies:
   bundler: ~> 1.10
