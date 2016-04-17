@@ -78,10 +78,10 @@ module Dedalus
         # an element *other than* an atom, we need to call #show on it
         render!(structure.show, origin: origin, dimensions: dimensions)
 
-      elsif structure.is_a?(Array) # we have a set of rows, assume divided evenly?
+      elsif structure.is_a?(Array) # we have a set of rows
         rows_with_height_hints = structure.select do |row| 
           if row.is_a?(Array)
-            row.any? { |col| !col.height.nil? } #(&:height)
+            row.any? { |col| !col.height.nil? }
           else
             !row.height.nil? 
           end
@@ -89,15 +89,9 @@ module Dedalus
         height_specified_by_hints = rows_with_height_hints.sum(&:height) * height
         height_cursor = 0
 
-        # do |row_with_height_hint|
-        #   height_specified
-        # end
-
         row_section_height = (height - height_specified_by_hints) / (structure.length)
         structure.each_with_index do |row, y_index|
           if row.is_a?(Array) # we have columns within the row
-            # raise "no columns yet"
-            # need to factor in width hints...
             columns_with_height_hints = row.select do |column|
               !column.width.nil?
             end
@@ -111,13 +105,11 @@ module Dedalus
               y = y0 + height_cursor
               width_cursor += current_column_width
               render!(column, origin: [x,y], dimensions: [current_column_width, height])
-              # ...
             end
-          else # no columns in the row, just need to compute new offsets...
-            # ...
+          else # no columns in the row
             current_row_height = row.height.nil? ? row_section_height : (row.height * height)
             x = x0
-            y = y0 + height_cursor #(current_row_height * (y_index))
+            y = y0 + height_cursor
             height_cursor += current_row_height
             render!(row, origin: [x,y], dimensions: [width, current_row_height])
           end
