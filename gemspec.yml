@@ -6,6 +6,9 @@ authors: Joseph Weissman
 email: jweissman1986@gmail.com
 homepage: https://rubygems.org/gems/dedalus
 
+dependencies:
+  geometer: ~> 0.1
+
 development_dependencies:
   bundler: ~> 1.10
   codeclimate-test-reporter: ~> 0.1
