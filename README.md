@@ -8,7 +8,7 @@
 
 ## Description
 
-Atomic design pattern library for [Joyce](https://github.com/deepcerulean/joyce)
+An incredible atomic design pattern library for [Joyce](https://github.com/deepcerulean/joyce)
 
 ## Features
 
