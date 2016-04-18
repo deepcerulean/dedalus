@@ -1,4 +1,13 @@
 module Dedalus
+  # try to infer active screen
+  def self.activate!(app_view)
+    @active_screen = app_view # Joyce::ApplicationView.descendants.first.current
+  end
+
+  def self.active_screen
+    @active_screen ||= nil
+  end
+
   class Element
     include PassiveRecord
     attr_accessor :position
@@ -9,10 +18,27 @@ module Dedalus
     # raw width/height
     attr_accessor :width, :height
 
+    attr_accessor :padding
+
+    # TODO remove screen attr everywhere...
+    def screen
+      Dedalus.active_screen
+    end
+
+    def draw_bounding_box(origin:, dimensions:, color: 0x70f0f0f0)
+      x,y = *origin
+      w,h = *dimensions
+
+      screen.window.draw_quad(x,y,color,
+                              x,y+h,color,
+                              x+w,y,color,
+                              x+w,y+h,color,ZOrder::Overlay)
+    end
   end
 
   class Atom < Element
-    attr_accessor :scale
+    attr_accessor :scale, :padding
+
   end
 
   class Molecule < Element
@@ -28,25 +54,29 @@ module Dedalus
   end
 
   module ZOrder
-    Background, Foreground, Text = *(0..3)
+    Background, Foreground, Text, Overlay = *(0..5)
   end
 
   module Elements
     class Image < Dedalus::Atom
-      attr_accessor :path
+      attr_accessor :path, :padding
+      after_create { self.padding ||= 0.0 }
 
-      def render(screen)
+      def render #(screen)
         x,y = *position
         p [ drawing_image_at: [x,y]]
-        asset.draw(x, y, ZOrder::Foreground, scale, scale)
+
+        asset.draw(x + padding, y + padding, ZOrder::Foreground, scale, scale)
+
+        draw_bounding_box(origin: [x,y], dimensions: [width + padding*2,height + padding*2])
       end
 
       def width
-        asset.width # * scale
+        asset.width * scale
       end
 
       def height
-        asset.height # * scale
+        asset.height * scale
       end
 
       private
@@ -68,22 +98,45 @@ module Dedalus
     end
 
     class Heading < Dedalus::Atom
-      attr_accessor :text, :scale
-      after_create { self.scale ||= 1.0 }
+      attr_accessor :text, :scale, :padding
+      after_create { self.scale ||= 1.0; self.padding ||= 10.0 }
 
-      def render(screen)
+      def font
+        screen.font
+      end
+
+      def render(*)
         x,y = *position
-        screen.font.draw(text, 20 + x, 20 + y, ZOrder::Text, self.scale, self.scale)
+        font.draw(text, x + padding, y + padding, ZOrder::Text, self.scale, self.scale)
+
+        draw_bounding_box(origin: [x,y], dimensions: dimensions)
+      end
+
+      def width
+        2*padding + (font.text_width(text) * scale)
+      end
+
+      def height
+        2*padding + (font.height * scale)
+      end
+
+      def dimensions
+        [ width, height ]
       end
     end
 
     class Paragraph < Dedalus::Atom
       attr_accessor :text, :scale
-      after_create { self.scale ||= 0.5 }
+      after_create { self.scale ||= 0.75 }
 
-      def render(screen)
+      # TODO padding...
+      def font; screen.font end
+
+      def render #(screen)
         x,y = *position
-        screen.font.draw(text, 20 + x, 20 + y, ZOrder::Text, self.scale, self.scale)
+
+        font.draw(text, x, y, ZOrder::Text, self.scale, self.scale)
+        draw_bounding_box(origin: [x,y], dimensions: [ font.text_width(text) * scale, font.height * scale ])
       end
     end
   end

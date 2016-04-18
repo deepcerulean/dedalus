@@ -1,12 +1,15 @@
 module Dedalus
   module PatternLibrary
     class ApplicationView < Joyce::ApplicationView
-      def render
-        composer.render!(welcome_screen)
+      def initialize(app)
+        super(app)
+        Dedalus.activate!(self)
+      end
 
-        cursor = Elements::Icon.for(:arrow_cursor)
+      def render
+        composer.render!(welcome_screen, dimensions: [ window.width, window.height ])
         cursor.update(position: mouse_position)
-        cursor.render(self)
+        cursor.render
       end
 
       private
@@ -14,8 +17,12 @@ module Dedalus
         @welcome_screen ||= WelcomeScreen.create
       end
 
+      def cursor
+        @cursor ||= Elements::Icon.for :arrow_cursor
+      end
+
       def composer
-        @composer ||= Dedalus::ApplicationViewComposer.new(self)
+        @composer ||= Dedalus::ApplicationViewComposer.new #(self)
       end
     end
 
@@ -32,7 +39,7 @@ module Dedalus
 
       private
       def heading
-        @heading ||= Elements::Heading.create(text: title)
+        @heading ||= Elements::Heading.create(text: title) #, height: 24)
       end
 
       def subheading
@@ -53,10 +60,6 @@ module Dedalus
 
       def show
         [ footer_message ]
-      end
-
-      def height_percent
-        0.1
       end
 
       private
@@ -81,7 +84,7 @@ module Dedalus
       end
 
       def height_percent
-        0.2
+        0.1
       end
 
       private
@@ -90,7 +93,7 @@ module Dedalus
       end
 
       def title_element
-        @title ||= Elements::Heading.create(text: name)
+        @title ||= Elements::Heading.create(text: name) #, height: 20)
       end
 
       def description_element
@@ -101,7 +104,7 @@ module Dedalus
     class ApplicationScreen < Dedalus::Template
       def layout
         [
-          app_header, 
+          app_header,
           [ sidebar, yield ],
           app_footer
         ]
@@ -129,12 +132,10 @@ module Dedalus
       def sidebar
         @sidebar ||= ApplicationSidebar.create(
           library_sections: [
-            # LibrarySection.create(name: "Home"),
             LibrarySection.create(name: "Atoms", icon: :atom, description: "Minimal elements which can't be split further"),
             LibrarySection.create(name: "Molecules", icon: :molecule, description: "Simple compounds of a few atoms"),
             LibrarySection.create(name: "Organisms", icon: :paramecium, description: "Highly-complex assemblages of molecules"),
-            LibrarySection.create(name: "Templates", icon: :hive, description: "Composed app screens with placeholder data"),
-            # LibrarySection.create(name: "Screens")
+            LibrarySection.create(name: "Templates", icon: :hive, description: "Assembled app screens with placeholders")
           ],
           width_percent: 0.30
         )
