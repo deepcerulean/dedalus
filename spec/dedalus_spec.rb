@@ -11,12 +11,12 @@ describe ApplicationViewComposer do
   subject(:composer) { ApplicationViewComposer.new }
   describe "#render" do
     context "a single atom" do
-      let(:atom) { Dedalus::Elements::Paragraph.create }
+      let(:atom) { Dedalus::Elements::Paragraph.new }
       let(:origin) { [0,0] }
       let(:dimensions) { [1024,720] }
 
       it 'should update position and render' do
-        expect(atom).to receive(:update).with(position: origin)
+        expect(atom).to receive(:position=).with(origin)
         expect(atom).to receive(:render)
 
         composer.render!(atom, origin: origin, dimensions: dimensions,mouse_position: [0,0])

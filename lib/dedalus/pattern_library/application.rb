@@ -11,7 +11,7 @@ module Dedalus
         atom_section = library.create_library_section(
           name: "Atoms",
           icon: :atom,
-          about: "Individisible components"
+          about: "Components that can't be split further"
         )
 
         atom_section.create_library_item(
@@ -36,6 +36,8 @@ module Dedalus
           name: "Templates",
           icon: :hive,
           about: "Assembled screens with placeholders"})
+
+        # just manually create a view from models for now...
 
         view.create_library_view(
           library_name: library.name,

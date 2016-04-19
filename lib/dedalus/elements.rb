@@ -9,7 +9,6 @@ module Dedalus
   end
 
   class Element
-    include PassiveRecord
     attr_accessor :position
 
     # in % as 0.0-1.0 (hint to compositing engine for elements in columns/rows respectively)
@@ -19,6 +18,10 @@ module Dedalus
     attr_accessor :width, :height
 
     attr_accessor :padding
+
+    def initialize(attrs={})
+      attrs.each { |(k,v)| instance_variable_set(:"@#{k}",v) }
+    end
 
     # TODO remove screen attr everywhere...
     def screen
@@ -35,6 +38,10 @@ module Dedalus
                               x,y+h,color,
                               x+w,y,color,
                               x+w,y+h,color,ZOrder::Overlay)
+    end
+
+    def hover
+      # ...
     end
   end
 

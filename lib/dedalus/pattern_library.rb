@@ -27,19 +27,19 @@ module Dedalus
 
       private
       def heading
-        @heading ||= Elements::Heading.create(text: title)
+        @heading ||= Elements::Heading.new(text: title)
       end
 
       def subheading
-        @subheading ||= Elements::Heading.create(text: subtitle, scale: 0.75)
+        @subheading ||= Elements::Heading.new(text: subtitle, scale: 0.75)
       end
     end
 
     class ApplicationSidebar < Dedalus::Organism
-      has_many :library_section_tab_molecules
+      attr_accessor :library_section_tab_molecules
 
       def show
-        self.library_section_tab_molecules.all
+        self.library_section_tab_molecules
       end
     end
 
@@ -52,7 +52,7 @@ module Dedalus
 
       private
       def footer_message
-        @footer_message ||=  Elements::Paragraph.create(text: assemble_text, scale: 0.5)
+        @footer_message ||=  Elements::Paragraph.new(text: assemble_text, scale: 0.5)
       end
 
       def assemble_text
@@ -61,13 +61,7 @@ module Dedalus
     end
 
     class LibrarySectionTabMolecule < Dedalus::Molecule
-      belongs_to :application_sidebar
-      attr_accessor :icon, :name, :description, :color
-
-      after_create do
-        self.height_percent ||= 0.15
-        self.icon_element.padding = 30.0
-      end
+      attr_accessor :icon, :name, :description, :color, :scale
 
       def show
         [[
@@ -76,20 +70,30 @@ module Dedalus
         ]]
       end
 
-      def on_hover
+      def hover
         p [ :hovering_on, section: name ]
+        @scale = 0.2
+        # self.background = 0xf0f0f0f0
+      end
+
+      def scale
+        @scale ||= 0.1
+      end
+
+      def height_percent
+        0.15
       end
 
       def icon_element
-        @icon_element ||= Elements::Icon.for(icon)
+        Elements::Icon.for(icon, padding: 30)
       end
 
       def title_element
-        @title ||= Elements::Heading.create(text: name, scale: 1.8)
+        Elements::Heading.new(text: name, scale: 0.6 + scale)
       end
 
       def description_element
-        @notes ||= Elements::Paragraph.create(text: description, scale: 0.5)
+        Elements::Paragraph.new(text: description, scale: 0.5)
       end
     end
 
@@ -104,13 +108,13 @@ module Dedalus
 
       def to_screen(library_sections:, mouse_position:)
         screen = ApplicationScreen.new(self)
-        screen.hydrate(library_sections: library_sections, mouse_position: mouse_position)
+        screen.hydrate(library_sections: library_sections)
         screen
       end
 
       private
       def app_header
-        @app_header ||= ApplicationHeader.create(
+        ApplicationHeader.new(
           title: 'Dedalus',
           subtitle: 'A Visual Pattern Library for Joyce',
           height_percent: 0.15
@@ -118,7 +122,7 @@ module Dedalus
       end
 
       def app_footer
-        @app_footer ||= ApplicationFooter.create(
+        ApplicationFooter.new(
           joyce_version: Joyce::VERSION,
           dedalus_version: Dedalus::VERSION,
           company: "Deep Cerulean Simulations and Games",
@@ -128,12 +132,12 @@ module Dedalus
       end
 
       def sidebar(sections)
-        @section_tabs ||= sections.map do |attrs|
-          LibrarySectionTabMolecule.create(attrs)
+        section_tabs = sections.map do |attrs|
+          LibrarySectionTabMolecule.new(attrs)
         end
 
-        @sidebar ||= ApplicationSidebar.create(
-          library_section_tab_molecules: @section_tabs,
+        ApplicationSidebar.new(
+          library_section_tab_molecules: section_tabs,
           width_percent: 0.45
         )
       end
@@ -150,13 +154,12 @@ module Dedalus
         end
       end
 
-      def hydrate(library_sections:, mouse_position:)
+      def hydrate(library_sections:)
         @library_sections = library_sections
-        @mouse_position   = mouse_position
       end
 
       def current_section
-        @current_section ||= WelcomeSectionOrganism.create
+        @current_section ||= WelcomeSectionOrganism.new
       end
     end
 
@@ -171,13 +174,13 @@ module Dedalus
       end
 
       def welcome_message
-        Elements::Heading.create(text: "Welcome to our Pattern Library!")
+        Elements::Heading.new(text: "Welcome to our Pattern Library!")
       end
 
       def welcome_discussion
         [
-          Elements::Paragraph.create(text: "Dedalus is a visual pattern library for 2-d games..."),
-          Elements::Paragraph.create(text: "Dedalus follows atomic design principles...")
+          Elements::Paragraph.new(text: "Dedalus is a visual pattern library for 2-d games..."),
+          Elements::Paragraph.new(text: "Dedalus follows atomic design principles...")
         ]
       end
     end

@@ -2,7 +2,6 @@ module Dedalus
   module Elements
     class Image < Dedalus::Atom
       attr_accessor :path, :padding
-      after_create { self.padding ||= 0.0 }
 
       def render #(screen)
         x,y = *position
@@ -10,7 +9,7 @@ module Dedalus
 
         asset.draw(x + padding, y + padding, ZOrder::Foreground, scale, scale)
 
-        draw_bounding_box(origin: [x,y], dimensions: dimensions)
+        # draw_bounding_box(origin: [x,y], dimensions: dimensions)
       end
 
       def width
@@ -23,6 +22,10 @@ module Dedalus
 
       def dimensions
         [ width, height ]
+      end
+
+      def padding
+        @padding ||= 10.0
       end
 
       private

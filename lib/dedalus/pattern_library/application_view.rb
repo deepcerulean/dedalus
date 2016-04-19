@@ -17,7 +17,7 @@ module Dedalus
       def render
         composer.render!( app_screen, mouse_position: mouse_position, dimensions: [ window.width, window.height ])
 
-        cursor.update(position: mouse_position)
+        cursor.position = mouse_position
         cursor.render
       end
 
@@ -34,7 +34,7 @@ module Dedalus
 
       private
       def app_template
-        @app_template ||= ApplicationTemplate.create
+        @app_template ||= ApplicationTemplate.new
       end
 
       def cursor

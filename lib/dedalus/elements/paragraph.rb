@@ -1,7 +1,13 @@
 module Dedalus
   module Elements
     class Paragraph < Text
-      after_create { self.scale ||= 0.75; self.padding ||= 8.0 }
+      def scale
+        @scale ||= 0.75
+      end
+
+      def padding
+        @padding ||= 7.6
+      end
     end
   end
 end

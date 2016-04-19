@@ -11,7 +11,7 @@ module Dedalus
         x,y = *position
         font.draw(text, x + padding, y + padding, ZOrder::Text, self.scale, self.scale)
 
-        draw_bounding_box(origin: [x,y], dimensions: dimensions)
+        # draw_bounding_box(origin: [x,y], dimensions: dimensions)
       end
 
       def width

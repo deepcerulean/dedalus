@@ -1,12 +1,14 @@
 module Dedalus
   module Elements
     class Icon < Image
-      after_create { self.scale ||= 0.0618 }
+      def scale
+        @scale ||= 0.062
+      end
 
       class << self
-        def for(sym)
+        def for(sym, attrs={})
           @icon_set ||= {}
-          @icon_set[sym] ||= create(path: "media/icons/#{sym}.png")
+          @icon_set[sym] ||= new(attrs.merge(path: "media/icons/#{sym}.png"))
           @icon_set[sym]
         end
       end

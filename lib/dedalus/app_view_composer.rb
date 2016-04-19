@@ -14,7 +14,7 @@ module Dedalus
       if structure.is_a?(Dedalus::Atom)
 
         # p [ render_atom_at: origin, element: structure.class.name ]
-        structure.update(position: origin)
+        structure.position = origin
         structure.render #(app_view)
 
       elsif structure.is_a?(Dedalus::Element)
@@ -25,9 +25,11 @@ module Dedalus
         # could check for mouse position overlay?
         mouse_hovering = element_bounding_box.contains?(mouse_coord)
         # could just call on hover here right before render..?
+        # would be good to separate all this out...
+        structure.hover if mouse_hovering
 
         render!(structure.show, origin: origin, dimensions: dimensions, mouse_position: mouse_position)
-        structure.draw_bounding_box(origin: origin, dimensions: dimensions, highlight: mouse_hovering)
+        # structure.draw_bounding_box(origin: origin, dimensions: dimensions, highlight: mouse_hovering)
 
       elsif structure.is_a?(Array) # we have a set of rows
         rows_with_percentage_height_hints = structure.select do |row|
