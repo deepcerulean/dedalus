@@ -1,35 +1,5 @@
 module Dedalus
   module PatternLibrary
-    class ApplicationView < Joyce::ApplicationView
-      def initialize(app)
-        super(app)
-        Dedalus.activate!(self)
-      end
-
-      def render
-        composer.render!(welcome_screen, dimensions: [ window.width, window.height ])
-        cursor.update(position: mouse_position)
-        cursor.render
-      end
-
-      private
-      def welcome_screen
-        @welcome_screen ||= WelcomeScreen.create
-      end
-
-      def cursor
-        @cursor ||= Elements::Icon.for :arrow_cursor
-      end
-
-      def composer
-        @composer ||= Dedalus::ApplicationViewComposer.new #(self)
-      end
-    end
-
-    class Application < Joyce::Application
-      viewed_with ApplicationView
-    end
-
     class ApplicationHeader < Dedalus::Organism
       attr_accessor :title, :subtitle
 
@@ -39,7 +9,7 @@ module Dedalus
 
       private
       def heading
-        @heading ||= Elements::Heading.create(text: title) #, height: 24)
+        @heading ||= Elements::Heading.create(text: title)
       end
 
       def subheading
@@ -64,17 +34,22 @@ module Dedalus
 
       private
       def footer_message
-        @footer_message ||=  Elements::Paragraph.create(text: assemble_text)
+        @footer_message ||=  Elements::Paragraph.create(text: assemble_text, scale: 0.5)
       end
 
       def assemble_text
-        "Powered by Dedalus v#{dedalus_version} and Joyce v#{joyce_version}. Copyright #{company} #{copyright}, all rights reserved."
+        "Powered by Dedalus v#{dedalus_version} and Joyce v#{joyce_version}. Copyright #{company} #{copyright}. All rights reserved."
       end
     end
 
     class LibrarySection < Dedalus::Molecule
       belongs_to :application_sidebar
-      attr_accessor :icon, :name, :description
+      attr_accessor :icon, :name, :description, :color
+
+      after_create do
+        self.height_percent ||= 0.15
+        self.icon_element.padding = 30.0
+      end
 
       def show
         [[
@@ -83,31 +58,32 @@ module Dedalus
         ]]
       end
 
-      def height_percent
-        0.1
-      end
-
-      private
       def icon_element
         @icon_element ||= Elements::Icon.for(icon)
       end
 
       def title_element
-        @title ||= Elements::Heading.create(text: name) #, height: 20)
+        @title ||= Elements::Heading.create(text: name, scale: 1.8)
       end
 
       def description_element
-        @notes ||= Elements::Paragraph.create(text: description)
+        @notes ||= Elements::Paragraph.create(text: description, scale: 0.5)
       end
     end
 
-    class ApplicationScreen < Dedalus::Template
-      def layout
+    class ApplicationTemplate < Dedalus::Template
+      def layout(sections:)
         [
           app_header,
-          [ sidebar, yield ],
+          [ sidebar(sections), yield ],
           app_footer
         ]
+      end
+
+      def to_screen(data)
+        screen = ApplicationScreen.new(self)
+        screen.hydrate(data)
+        screen
       end
 
       private
@@ -115,7 +91,7 @@ module Dedalus
         @app_header ||= ApplicationHeader.create(
           title: 'Dedalus',
           subtitle: 'A Visual Pattern Library for Joyce',
-          height_percent: 0.10
+          height_percent: 0.15
         )
       end
 
@@ -129,22 +105,48 @@ module Dedalus
         )
       end
 
-      def sidebar
+      def sidebar(sections)
+        @lib_sections ||= sections.map do |attrs|
+          LibrarySection.create(attrs)
+        end
+
         @sidebar ||= ApplicationSidebar.create(
-          library_sections: [
-            LibrarySection.create(name: "Atoms", icon: :atom, description: "Minimal elements which can't be split further"),
-            LibrarySection.create(name: "Molecules", icon: :molecule, description: "Simple compounds of a few atoms"),
-            LibrarySection.create(name: "Organisms", icon: :paramecium, description: "Highly-complex assemblages of molecules"),
-            LibrarySection.create(name: "Templates", icon: :hive, description: "Assembled app screens with placeholders")
-          ],
-          width_percent: 0.30
+          library_sections: @lib_sections,
+          # [
+          #   atoms_library_section,
+          #   LibrarySection.create(name: "Molecules", icon: :molecule,   description: "Simple compounds of a few atoms"),
+          #   LibrarySection.create(name: "Organisms", icon: :paramecium, description: "Highly-complex assemblages of molecules"),
+          #   LibrarySection.create(name: "Templates", icon: :hive,       description: "Assembled app screens with placeholders")
+          # ],
+          width_percent: 0.45
+        )
+      end
+
+      def atoms_library_section
+        @atom_section ||= LibrarySection.create(
+          name: "Atoms",
+          icon: :atom,
+          description: "Minimal elements which can't be split further",
+          color: 0x70a0c0c0
         )
       end
     end
 
-    class WelcomeScreen < ApplicationScreen
+    class ApplicationScreen < Dedalus::Screen
+      def initialize(template)
+        @template = template
+      end
+
       def show
-        layout { welcome_message }
+        @template.layout(sections: library_section_data) { welcome_message }
+      end
+
+      def hydrate(app_data)
+        @app_data = app_data
+      end
+
+      def library_section_data
+        @app_data[:library_sections]
       end
 
       def welcome_message
