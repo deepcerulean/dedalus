@@ -1,7 +1,10 @@
 module Dedalus
   class ApplicationViewComposer
+    include Geometer::PointHelpers
+    include Geometer::DimensionHelpers
+
     # TODO note the vertical/horizontal cases are totally symmetrical, maybe we can factor out some shared behavior?
-    def render!(structure, origin: [0,0], dimensions:)
+    def render!(structure, origin: [0,0], dimensions:, mouse_position:)
       # puts "--- called render!"
       # # structure = element.show
 
@@ -16,8 +19,15 @@ module Dedalus
 
       elsif structure.is_a?(Dedalus::Element)
         # an element *other than* an atom, we need to call #show on it
-        render!(structure.show, origin: origin, dimensions: dimensions)
-        structure.draw_bounding_box(origin: origin, dimensions: dimensions)
+
+        mouse_coord = coord(*mouse_position)
+        element_bounding_box = Geometer::Rectangle.new(coord(*origin), dim(*dimensions))
+        # could check for mouse position overlay?
+        mouse_hovering = element_bounding_box.contains?(mouse_coord)
+        # could just call on hover here right before render..?
+
+        render!(structure.show, origin: origin, dimensions: dimensions, mouse_position: mouse_position)
+        structure.draw_bounding_box(origin: origin, dimensions: dimensions, highlight: mouse_hovering)
 
       elsif structure.is_a?(Array) # we have a set of rows
         rows_with_percentage_height_hints = structure.select do |row|
@@ -74,7 +84,7 @@ module Dedalus
             column_section_width = (width - width_specified_by_hints) / (row.length - columns_with_width_hints.length)
             row.each_with_index do |column, x_index|
               if column.is_a?(Array) # we have rows INSIDE the columns! i think we need to recurse...
-                render!(column, origin: [x0 + width_cursor,y0 + height_cursor], dimensions: [column_section_width, row_section_height])
+                render!(column, origin: [x0 + width_cursor,y0 + height_cursor], dimensions: [column_section_width, row_section_height], mouse_position: mouse_position)
               else
                 current_column_width = if !column.width.nil?
                                          column.width
@@ -85,7 +95,7 @@ module Dedalus
                                        end
                 x = x0 + width_cursor
                 y = y0 + height_cursor
-                render!(column, origin: [x,y], dimensions: [current_column_width, height])
+                render!(column, origin: [x,y], dimensions: [current_column_width, height], mouse_position: mouse_position)
 
                 width_cursor += current_column_width
               end
@@ -103,7 +113,7 @@ module Dedalus
             x = x0
             y = y0 + height_cursor
             dims = [width, current_row_height]
-            render!(row, origin: [x,y], dimensions: dims)
+            render!(row, origin: [x,y], dimensions: dims, mouse_position: mouse_position)
 
             height_cursor += current_row_height
           end

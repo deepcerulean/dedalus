@@ -1,5 +1,23 @@
 module Dedalus
   module PatternLibrary
+    module Models
+      class LibraryItem < Metacosm::Model
+        attr_accessor :name, :kind, :description
+        belongs_to :library_section
+      end
+
+      class LibrarySection < Metacosm::Model
+        attr_accessor :name, :about, :description, :icon
+        belongs_to :library
+        has_many :library_items
+      end
+
+      class Library < Metacosm::Model
+        attr_accessor :name
+        has_many :library_sections
+      end
+    end
+
     class ApplicationHeader < Dedalus::Organism
       attr_accessor :title, :subtitle
 
@@ -18,10 +36,10 @@ module Dedalus
     end
 
     class ApplicationSidebar < Dedalus::Organism
-      has_many :library_sections
+      has_many :library_section_tab_molecules
 
       def show
-        self.library_sections.all
+        self.library_section_tab_molecules.all
       end
     end
 
@@ -42,7 +60,7 @@ module Dedalus
       end
     end
 
-    class LibrarySection < Dedalus::Molecule
+    class LibrarySectionTabMolecule < Dedalus::Molecule
       belongs_to :application_sidebar
       attr_accessor :icon, :name, :description, :color
 
@@ -56,6 +74,10 @@ module Dedalus
           icon_element, [ title_element,
                           description_element ]
         ]]
+      end
+
+      def on_hover
+        p [ :hovering_on, section: name ]
       end
 
       def icon_element
@@ -72,17 +94,17 @@ module Dedalus
     end
 
     class ApplicationTemplate < Dedalus::Template
-      def layout(sections:)
+      def layout(library_sections:)
         [
           app_header,
-          [ sidebar(sections), yield ],
+          [ sidebar(library_sections), yield ],
           app_footer
         ]
       end
 
-      def to_screen(data)
+      def to_screen(library_sections:, mouse_position:)
         screen = ApplicationScreen.new(self)
-        screen.hydrate(data)
+        screen.hydrate(library_sections: library_sections, mouse_position: mouse_position)
         screen
       end
 
@@ -106,28 +128,13 @@ module Dedalus
       end
 
       def sidebar(sections)
-        @lib_sections ||= sections.map do |attrs|
-          LibrarySection.create(attrs)
+        @section_tabs ||= sections.map do |attrs|
+          LibrarySectionTabMolecule.create(attrs)
         end
 
         @sidebar ||= ApplicationSidebar.create(
-          library_sections: @lib_sections,
-          # [
-          #   atoms_library_section,
-          #   LibrarySection.create(name: "Molecules", icon: :molecule,   description: "Simple compounds of a few atoms"),
-          #   LibrarySection.create(name: "Organisms", icon: :paramecium, description: "Highly-complex assemblages of molecules"),
-          #   LibrarySection.create(name: "Templates", icon: :hive,       description: "Assembled app screens with placeholders")
-          # ],
+          library_section_tab_molecules: @section_tabs,
           width_percent: 0.45
-        )
-      end
-
-      def atoms_library_section
-        @atom_section ||= LibrarySection.create(
-          name: "Atoms",
-          icon: :atom,
-          description: "Minimal elements which can't be split further",
-          color: 0x70a0c0c0
         )
       end
     end
@@ -138,19 +145,40 @@ module Dedalus
       end
 
       def show
-        @template.layout(sections: library_section_data) { welcome_message }
+        @template.layout(library_sections: @library_sections) do
+          current_section
+        end
       end
 
-      def hydrate(app_data)
-        @app_data = app_data
+      def hydrate(library_sections:, mouse_position:)
+        @library_sections = library_sections
+        @mouse_position   = mouse_position
       end
 
-      def library_section_data
-        @app_data[:library_sections]
+      def current_section
+        @current_section ||= WelcomeSectionOrganism.create
+      end
+    end
+
+    # actual content of the lib section pane
+    class LibrarySectionOrganism < Dedalus::Organism
+      # ...
+    end
+
+    class WelcomeSectionOrganism < LibrarySectionOrganism
+      def show
+        [welcome_message] + welcome_discussion
       end
 
       def welcome_message
-        @welcome_message ||= Elements::Heading.create(text: "Welcome to our Pattern Library!")
+        Elements::Heading.create(text: "Welcome to our Pattern Library!")
+      end
+
+      def welcome_discussion
+        [
+          Elements::Paragraph.create(text: "Dedalus is a visual pattern library for 2-d games..."),
+          Elements::Paragraph.create(text: "Dedalus follows atomic design principles...")
+        ]
       end
     end
   end

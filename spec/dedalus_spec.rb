@@ -19,7 +19,7 @@ describe ApplicationViewComposer do
         expect(atom).to receive(:update).with(position: origin)
         expect(atom).to receive(:render)
 
-        composer.render!(atom, origin: origin, dimensions: dimensions)
+        composer.render!(atom, origin: origin, dimensions: dimensions,mouse_position: [0,0])
       end
     end
   end

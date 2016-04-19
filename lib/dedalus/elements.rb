@@ -25,9 +25,11 @@ module Dedalus
       Dedalus.active_screen
     end
 
-    def draw_bounding_box(origin:, dimensions:, color: 0x70f0f0f0)
+    def draw_bounding_box(origin:, dimensions:, color: 0x70f0f0f0, highlight: false)
       x,y = *origin
       w,h = *dimensions
+
+      color = 0xa0f0f0f0 if highlight
 
       screen.window.draw_quad(x,y,color,
                               x,y+h,color,
