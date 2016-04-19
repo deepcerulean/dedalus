@@ -5,18 +5,11 @@ module Dedalus
 
     # TODO note the vertical/horizontal cases are totally symmetrical, maybe we can factor out some shared behavior?
     def render!(structure, origin: [0,0], dimensions:, mouse_position:)
-      # puts "--- called render!"
-      # # structure = element.show
-
       width, height = *dimensions
       x0, y0 = *origin
 
       if structure.is_a?(Dedalus::Atom)
-
-        # p [ render_atom_at: origin, element: structure.class.name ]
-        structure.position = origin
-        structure.render #(app_view)
-
+        render_atom(structure, origin: origin)
       elsif structure.is_a?(Dedalus::Element)
         # an element *other than* an atom, we need to call #show on it
 
@@ -28,8 +21,15 @@ module Dedalus
         # would be good to separate all this out...
         structure.hover if mouse_hovering
 
-        render!(structure.show, origin: origin, dimensions: dimensions, mouse_position: mouse_position)
-        # structure.draw_bounding_box(origin: origin, dimensions: dimensions, highlight: mouse_hovering)
+        pad = structure.padding || 5.0
+        pad_origin = [x0 + pad, y0 + pad ]
+        pad_dims = [width - pad*2, height - pad*2 ]
+
+        if structure.background_color
+          structure.draw_bounding_box(color: structure.background_color, origin: pad_origin, dimensions: pad_dims, highlight: mouse_hovering)
+        end
+
+        render!(structure.show, origin: pad_origin, dimensions: pad_dims, mouse_position: mouse_position)
 
       elsif structure.is_a?(Array) # we have a set of rows
         rows_with_percentage_height_hints = structure.select do |row|
@@ -121,6 +121,12 @@ module Dedalus
           end
         end
       end
+    end
+
+
+    def render_atom(atom, origin:)
+      atom.position = origin
+      atom.render
     end
   end
 end

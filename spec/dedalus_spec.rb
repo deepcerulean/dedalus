@@ -18,7 +18,6 @@ describe ApplicationViewComposer do
       it 'should update position and render' do
         expect(atom).to receive(:position=).with(origin)
         expect(atom).to receive(:render)
-
         composer.render!(atom, origin: origin, dimensions: dimensions,mouse_position: [0,0])
       end
     end

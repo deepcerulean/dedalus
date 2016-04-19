@@ -7,7 +7,7 @@ module Dedalus
       end
 
       class LibrarySection < Metacosm::Model
-        attr_accessor :name, :about, :description, :icon
+        attr_accessor :name, :about, :description, :icon, :color
         belongs_to :library
         has_many :library_items
       end
@@ -61,13 +61,16 @@ module Dedalus
     end
 
     class LibrarySectionTabMolecule < Dedalus::Molecule
-      attr_accessor :icon, :name, :description, :color, :scale
+      attr_accessor :icon, :name, :description, :scale
 
       def show
+        # Container.new(
         [[
           icon_element, [ title_element,
                           description_element ]
         ]]
+        #   color: color
+        # )
       end
 
       def hover
