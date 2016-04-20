@@ -15,28 +15,40 @@ module Dedalus
       end
 
       def render
-        composer.render!( app_screen, mouse_position: mouse_position, dimensions: [ window.width, window.height ])
+        screen = app_screen
+
+        screen = composer.hover_molecule(screen, [window.width, window.height], mouse_position: mouse_position)
+        composer.render!(screen, [ window.width, window.height ])
 
         cursor.position = mouse_position
         cursor.render
       end
 
+      def click
+        p [ :app_view_click ]
+        composer.click_molecule(app_screen, [window.width, window.height], mouse_position: mouse_position)
+      end
+
       def app_screen
-        app_template.to_screen(
-          mouse_position: mouse_position,
-          library_sections: [welcome_tab] + library_view.library_section_tabs
+        ApplicationTemplate.new.to_screen(
+          library_sections: [welcome_tab] + library_view.library_section_tabs,
+          current_section_name: current_section
         )
       end
 
       def welcome_tab
-        { name: "Welcome", icon: :house, description: "About Dedalus" }
+        { name: "Welcome", icon: :house, description: "About Dedalus", background_color: 0x70a0c0d0 }
+      end
+
+      def current_section
+        @current_section_name ||= "Welcome"
+      end
+
+      def route_to(section_name)
+        @current_section_name = section_name
       end
 
       private
-      def app_template
-        @app_template ||= ApplicationTemplate.new
-      end
-
       def cursor
         @cursor ||= Elements::Icon.for :arrow_cursor
       end

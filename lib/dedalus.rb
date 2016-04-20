@@ -1,5 +1,6 @@
 require 'joyce'
 require 'geometer'
+require 'pry'
 
 require 'dedalus/version'
 require 'dedalus/app_view_composer'

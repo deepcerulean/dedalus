@@ -3,6 +3,11 @@ module Dedalus
     class Application < Joyce::Application
       viewed_with ApplicationView
 
+      def click
+        p [ :app_click ]
+        view.click
+      end
+
       def setup
         library = Models::Library.create(
           name: "Dedalus Pattern Library"

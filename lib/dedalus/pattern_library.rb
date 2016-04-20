@@ -22,7 +22,10 @@ module Dedalus
       attr_accessor :title, :subtitle
 
       def show
-        [ heading, subheading ]
+        [
+          heading,
+          subheading
+        ]
       end
 
       private
@@ -64,13 +67,10 @@ module Dedalus
       attr_accessor :icon, :name, :description, :scale
 
       def show
-        # Container.new(
         [[
           icon_element, [ title_element,
                           description_element ]
         ]]
-        #   color: color
-        # )
       end
 
       def hover
@@ -79,8 +79,12 @@ module Dedalus
         # self.background = 0xf0f0f0f0
       end
 
+      def click
+        screen.route_to(name) #LibrarySectionOrganism.for(name))
+      end
+
       def scale
-        @scale ||= 0.1
+        @scale ||= 0.0
       end
 
       def height_percent
@@ -109,10 +113,11 @@ module Dedalus
         ]
       end
 
-      def to_screen(library_sections:, mouse_position:)
-        screen = ApplicationScreen.new(self)
-        screen.hydrate(library_sections: library_sections)
-        screen
+      def to_screen(library_sections:, current_section_name:) #, mouse_position:)
+        # p [ :template_to_screen, sections: library_sections ]
+        # screen = ApplicationScreen.new(self)
+        ApplicationScreen.new(self).
+          hydrate(library_sections: library_sections, current_section_name: current_section_name)
       end
 
       private
@@ -135,14 +140,16 @@ module Dedalus
       end
 
       def sidebar(sections)
-        section_tabs = sections.map do |attrs|
+        @sidebar ||= ApplicationSidebar.new(
+          library_section_tab_molecules: section_tabs(sections),
+          width_percent: 0.35
+        )
+      end
+
+      def section_tabs(sections)
+        sections.map do |attrs|
           LibrarySectionTabMolecule.new(attrs)
         end
-
-        ApplicationSidebar.new(
-          library_section_tab_molecules: section_tabs,
-          width_percent: 0.45
-        )
       end
     end
 
@@ -157,17 +164,30 @@ module Dedalus
         end
       end
 
-      def hydrate(library_sections:)
+      def hydrate(library_sections:, current_section_name:)
         @library_sections = library_sections
+        @current_section_name = current_section_name
+        self
+      end
+
+      def background_color
+        0xa0a0a0a0
       end
 
       def current_section
-        @current_section ||= WelcomeSectionOrganism.new
+        LibrarySectionOrganism.for(@current_section_name)
       end
     end
 
     # actual content of the lib section pane
     class LibrarySectionOrganism < Dedalus::Organism
+      def self.for(section_name)
+        case section_name
+        when 'Atoms' then AtomSectionOrganism.new
+        when 'Welcome' then WelcomeSectionOrganism.new
+        else raise "Unknown section #{section_name}"
+        end
+      end
       # ...
     end
 
@@ -184,6 +204,22 @@ module Dedalus
         [
           Elements::Paragraph.new(text: "Dedalus is a visual pattern library for 2-d games..."),
           Elements::Paragraph.new(text: "Dedalus follows atomic design principles...")
+        ]
+      end
+    end
+
+    class AtomSectionOrganism < LibrarySectionOrganism
+      def show
+        [intro_message] + atom_discussion
+      end
+
+      def intro_message
+        Elements::Heading.new text: "Atoms are indivisible components"
+      end
+
+      def atom_discussion
+        [
+          Elements::Paragraph.new(text: "Atoms are great!")
         ]
       end
     end
