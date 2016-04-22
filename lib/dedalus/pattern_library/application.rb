@@ -2,6 +2,7 @@ module Dedalus
   module PatternLibrary
     class Application < Joyce::Application
       viewed_with ApplicationView
+      include Models
 
       def click
         p [ :app_click ]
@@ -9,9 +10,7 @@ module Dedalus
       end
 
       def setup
-        library = Models::Library.create(
-          name: "Dedalus Pattern Library"
-        )
+        library = Library.create(name: "Dedalus Pattern Library")
 
         atom_section = library.create_library_section(
           name: "Atoms",
@@ -50,12 +49,20 @@ module Dedalus
 
         view.create_library_view(
           library_name: library.name,
-          # library_id: library.id,
+
+          library_sections: library.library_sections.map do |section|
+            {
+              title: section.name,
+              subtitle: section.about,
+              color: section.color
+            }
+          end,
+
           library_section_tabs: library.library_sections.map do |section|
             { name: section.name,
-              icon: section.icon, 
+              icon: section.icon,
               description: section.about,
-              background_color: Palette.decode_color(section.color)
+              section_color: section.color
             }
           end
         )

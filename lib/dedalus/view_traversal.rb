@@ -28,7 +28,7 @@ module Dedalus
         @atom_callback.call(structure, origin: origin, dimensions: dimensions) if @atom_callback
       elsif structure.is_a?(Dedalus::Element)
         # an element *other than* an atom, we need to call #show on it
-        pad = structure.padding || 0.0
+        pad = structure.padding || 2.0
         pad_origin = [x0 + pad, y0 + pad ]
         pad_dims = [width - pad*2, height - pad*2 ]
 
@@ -43,14 +43,14 @@ module Dedalus
         walk!(structure.show, origin: pad_origin, dimensions: pad_dims)
 
       elsif structure.is_a?(Array) # we have a set of rows
-        walk_row!(structure, origin: origin, dimensions: dimensions)
+        walk_rows!(structure, origin: origin, dimensions: dimensions)
       end
     end
 
-    def walk_row!(structure, origin:, dimensions:)
+    def walk_rows!(rows, origin:, dimensions:)
       width, height = *dimensions
       x0, y0 = *origin
-      rows_with_percentage_height_hints = structure.select do |row|
+      rows_with_percentage_height_hints = rows.select do |row|
         if row.is_a?(Array)
           false
         else
@@ -58,7 +58,7 @@ module Dedalus
         end
       end
 
-      rows_with_raw_height_hints = structure.select do |row|
+      rows_with_raw_height_hints = rows.select do |row|
         if row.is_a?(Array)
           false
         else
@@ -74,9 +74,9 @@ module Dedalus
 
       height_cursor = 0
 
-      row_section_height = (height - height_specified_by_hints) / (structure.length - rows_with_height_hints.length)
+      row_section_height = (height - height_specified_by_hints) / (rows.length - rows_with_height_hints.length)
 
-      structure.each_with_index do |row, y_index|
+      rows.each_with_index do |row, y_index|
         if row.is_a?(Array) # we have columns within the row
           columns_with_percentage_width_hints = row.select do |column|
             if column.is_a?(Array)
@@ -118,7 +118,7 @@ module Dedalus
                                      end
               x = x0 + width_cursor
               y = y0 + height_cursor
-              walk!(column, origin: [x,y], dimensions: [ current_column_width, height - height_cursor ])
+              walk!(column, origin: [x,y], dimensions: [ current_column_width, row_section_height ]) # height - height_cursor ])
 
               width_cursor += current_column_width
             end

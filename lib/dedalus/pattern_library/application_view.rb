@@ -1,10 +1,5 @@
 module Dedalus
   module PatternLibrary
-    class LibraryView < Metacosm::View
-      attr_accessor :library_name, :library_section_tabs
-      belongs_to :application_view
-    end
-
     class ApplicationView < Joyce::ApplicationView
       attr_reader :id
       has_one :library_view
@@ -26,6 +21,7 @@ module Dedalus
 
       def click
         p [ :app_view_click ]
+        # TODO cascade click through whole strucutre? need to even click atoms maybe...?
         composer.click_molecule(app_screen, [window.width, window.height], mouse_position: mouse_position)
       end
 

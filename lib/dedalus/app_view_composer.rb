@@ -17,7 +17,7 @@ module Dedalus
           element_bounding_box = Geometer::Rectangle.new(coord(*origin), dim(*dimensions))
           mouse_overlap = element_bounding_box.contains?(mouse_coord)
           if mouse_overlap
-            molecule.send(message) 
+            molecule.send(message)
           end
         end
       end
@@ -40,18 +40,11 @@ module Dedalus
         end
 
         on_element do |element, origin:, dimensions:|
-          x0,y0 = *origin
-          width,height = *dimensions
-
-          pad = element.padding || 5.0
-          pad_origin = [x0 + pad, y0 + pad ]
-          pad_dims = [width - pad*2, height - pad*2 ]
-
           if element.background_color
             element.draw_bounding_box(
               color: element.background_color,
-              origin: pad_origin, 
-              dimensions: pad_dims
+              origin: origin,
+              dimensions: dimensions
             )
           end
         end

@@ -1,23 +1,5 @@
 module Dedalus
   module PatternLibrary
-    module Models
-      class LibraryItem < Metacosm::Model
-        attr_accessor :name, :kind, :description
-        belongs_to :library_section
-      end
-
-      class LibrarySection < Metacosm::Model
-        attr_accessor :name, :about, :description, :icon, :color
-        belongs_to :library
-        has_many :library_items
-      end
-
-      class Library < Metacosm::Model
-        attr_accessor :name
-        has_many :library_sections
-      end
-    end
-
     class ApplicationHeader < Dedalus::Organism
       attr_accessor :title, :subtitle
 
@@ -64,7 +46,7 @@ module Dedalus
     end
 
     class LibrarySectionTabMolecule < Dedalus::Molecule
-      attr_accessor :icon, :name, :description, :scale
+      attr_accessor :icon, :name, :description, :scale, :highlight, :section_color
 
       def show
         [[
@@ -76,7 +58,11 @@ module Dedalus
       def hover
         p [ :hovering_on, section: name ]
         @scale = 0.2
-        # self.background = 0xf0f0f0f0
+      end
+
+      def background_color
+        color = self.highlight ? "light#{@section_color}" : @section_color
+        Palette.decode_color(color)
       end
 
       def click
@@ -105,22 +91,24 @@ module Dedalus
     end
 
     class ApplicationTemplate < Dedalus::Template
-      def layout(library_sections:)
+      def layout(library_sections:, current_section_name:)
         [
           app_header,
-          [ sidebar(library_sections), yield ],
+          [ sidebar(library_sections, current_section_name), library_page(current_section_name) ],
           app_footer
         ]
       end
 
-      def to_screen(library_sections:, current_section_name:) #, mouse_position:)
-        # p [ :template_to_screen, sections: library_sections ]
-        # screen = ApplicationScreen.new(self)
-        ApplicationScreen.new(self).
-          hydrate(library_sections: library_sections, current_section_name: current_section_name)
+      def to_screen(library_sections:, current_section_name:)
+        app_screen = ApplicationScreen.new(self)
+        app_screen.hydrate(library_sections: library_sections, current_section_name: current_section_name)
       end
 
       private
+      def library_page(name)
+        LibrarySectionOrganism.for(name)
+      end
+
       def app_header
         ApplicationHeader.new(
           title: 'Dedalus',
@@ -141,17 +129,18 @@ module Dedalus
         )
       end
 
-      def sidebar(sections)
+      def sidebar(sections, current_section_name)
         @sidebar ||= ApplicationSidebar.new(
-          library_section_tab_molecules: section_tabs(sections),
+          library_section_tab_molecules: section_tabs(sections, current_section_name),
           width_percent: 0.4,
-          background_color: 0xa0a0a0a0
+          background_color: 0x60a0a0a0
         )
       end
 
-      def section_tabs(sections)
+      def section_tabs(sections, current_section_name)
         sections.map do |attrs|
-          LibrarySectionTabMolecule.new(attrs)
+          highlight = attrs[:name] == current_section_name
+          LibrarySectionTabMolecule.new(attrs.merge(highlight: highlight))
         end
       end
     end
@@ -162,13 +151,14 @@ module Dedalus
       end
 
       def padding
-        0
+        4.2
       end
 
       def show
-        @template.layout(library_sections: @library_sections) do
-          current_section
-        end
+        @template.layout(
+          library_sections: @library_sections,
+          current_section_name: @current_section_name
+        )
       end
 
       def hydrate(library_sections:, current_section_name:)
@@ -179,10 +169,6 @@ module Dedalus
 
       def background_color
         0x40a0a0a0
-      end
-
-      def current_section
-        LibrarySectionOrganism.for(@current_section_name)
       end
     end
 
@@ -199,10 +185,16 @@ module Dedalus
         end
       end
 
+      def padding; 20 end
+
+      # default color
       def background_color
-        0xa0a0a0a0
+        Palette.decode_color(section_color) #'gray'
       end
-      # ...
+
+      def section_color
+        'gray'
+      end
     end
 
     class WelcomeSectionOrganism < LibrarySectionOrganism
