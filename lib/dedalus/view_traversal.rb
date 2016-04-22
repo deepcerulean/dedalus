@@ -41,7 +41,6 @@ module Dedalus
         end
 
         walk!(structure.show, origin: pad_origin, dimensions: pad_dims)
-
       elsif structure.is_a?(Array) # we have a set of rows
         walk_rows!(structure, origin: origin, dimensions: dimensions)
       end
@@ -50,98 +49,73 @@ module Dedalus
     def walk_rows!(rows, origin:, dimensions:)
       width, height = *dimensions
       x0, y0 = *origin
-      rows_with_percentage_height_hints = rows.select do |row|
+
+      subdivide_line(rows, distance: height, attr: :height) do |row, current_row_height, height_cursor|
         if row.is_a?(Array)
-          false
-        else
-          !row.height_percent.nil?
-        end
-      end
-
-      rows_with_raw_height_hints = rows.select do |row|
-        if row.is_a?(Array)
-          false
-        else
-          !row.height.nil?
-        end
-      end
-
-      rows_with_height_hints = rows_with_percentage_height_hints + rows_with_raw_height_hints
-
-      height_specified_by_hints =
-        (rows_with_percentage_height_hints.sum(&:height_percent) * height) +
-        (rows_with_raw_height_hints.sum(&:height))
-
-      height_cursor = 0
-
-      row_section_height = (height - height_specified_by_hints) / (rows.length - rows_with_height_hints.length)
-
-      rows.each_with_index do |row, y_index|
-        if row.is_a?(Array) # we have columns within the row
-          columns_with_percentage_width_hints = row.select do |column|
-            if column.is_a?(Array)
-              false
-            else
-              !column.width_percent.nil?
-            end
-          end
-
-          columns_with_raw_width_hints = row.select do |column|
-            if column.is_a?(Array)
-              false
-            else
-              !column.width.nil?
-            end
-          end
-
-          columns_with_width_hints = columns_with_percentage_width_hints + columns_with_raw_width_hints
-
-          width_specified_by_hints =
-            (columns_with_percentage_width_hints.sum(&:width_percent) * width.to_f) +
-            (columns_with_raw_width_hints.sum(&:width))
-
-          width_cursor = 0
-
-          column_section_width = (width - width_specified_by_hints) / (row.length - columns_with_width_hints.length)
-          row.each_with_index do |column, x_index|
+          subdivide_line(row, distance: width, attr: :width) do |column, current_column_width, width_cursor|
             if column.is_a?(Array) # we have rows INSIDE the columns! i think we need to recurse...
               new_origin = [x0 + width_cursor,y0 + height_cursor]
-              new_dims = [ column_section_width, row_section_height ]
+              new_dims = [ current_column_width, current_row_height ]
               walk!(column, origin: new_origin, dimensions: new_dims)
             else
-              current_column_width = if !column.width.nil?
-                                       column.width
-                                     elsif !column.width_percent.nil?
-                                       column.width_percent * width
-                                     else
-                                       column_section_width
-                                     end
               x = x0 + width_cursor
               y = y0 + height_cursor
-              walk!(column, origin: [x,y], dimensions: [ current_column_width, row_section_height ]) # height - height_cursor ])
+              walk!(column, origin: [x,y], dimensions: [ current_column_width, current_row_height ])
 
               width_cursor += current_column_width
             end
           end
-
-          height_cursor += row_section_height
-        else # no columns in the row
-          current_row_height = if !row.height.nil?
-                                 row.height
-                               elsif !row.height_percent.nil?
-                                 row.height_percent * height
-                               else
-                                 row_section_height
-                               end
+        else
           x = x0
           y = y0 + height_cursor
           dims = [width, current_row_height]
           walk!(row, origin: [x,y], dimensions: dims)
+        end
+      end
+    end
 
-          height_cursor += current_row_height
+    def subdivide_line(elements, distance:, attr:)
+      elements_with_relative_hints = elements.select do |element|
+        if element.is_a?(Array)
+          false
+        else
+          !element.send(:"#{attr}_percent").nil?
+        end
+      end
+
+      elements_with_absolute_hints = elements.select do |element|
+        if element.is_a?(Array)
+          false
+        else
+          !element.send(attr).nil?
+        end
+      end
+
+      elements_with_hints = elements_with_relative_hints + elements_with_absolute_hints
+      distance_specified_by_hints =
+        (elements_with_relative_hints.sum(&:"#{attr}_percent") * distance) +
+        (elements_with_absolute_hints.sum(&:height))
+
+      default_element_section_distance = (distance - distance_specified_by_hints) / (elements.length - elements_with_hints.length)
+
+      distance_cursor = 0
+      elements.each_with_index do |element, index|
+        if element.is_a?(Array)
+          yield(element, default_element_section_distance, distance_cursor)
+          distance_cursor += default_element_section_distance
+        else
+          current_element_distance = if !element.send(attr).nil?
+                                 element.send(attr)
+                               elsif !element.send(:"#{attr}_percent").nil?
+                                 element.send(:"#{attr}_percent") * distance
+                               else
+                                 default_element_section_distance
+                               end
+
+          yield(element, current_element_distance, distance_cursor)
+          distance_cursor += current_element_distance
         end
       end
     end
   end
 end
-

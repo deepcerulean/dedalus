@@ -17,7 +17,7 @@ module Dedalus
       when 'gray' then 0xa0c0c0c0
       when 'lightgray' then 0xa0f0f0f0
 
-      else 0xf0f0f0f0
+      else 0x00f0f0f0
       end
     end
   end
