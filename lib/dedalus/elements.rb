@@ -39,7 +39,7 @@ module Dedalus
       screen.window.draw_quad(x,y,color,
                               x,y+h,color,
                               x+w,y,color,
-                              x+w,y+h,color,ZOrder::Overlay)
+                              x+w,y+h,color,ZOrder::Background)
     end
   end
 

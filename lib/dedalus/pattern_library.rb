@@ -92,7 +92,7 @@ module Dedalus
       end
 
       def icon_element
-        Elements::Icon.for(icon, padding: 30)
+        Elements::Icon.for(icon, padding: 20)
       end
 
       def title_element
@@ -125,7 +125,8 @@ module Dedalus
         ApplicationHeader.new(
           title: 'Dedalus',
           subtitle: 'A Visual Pattern Library for Joyce',
-          height_percent: 0.15
+          height_percent: 0.15,
+          background_color: 0xa0c0d0e0
         )
       end
 
@@ -135,14 +136,16 @@ module Dedalus
           dedalus_version: Dedalus::VERSION,
           company: "Deep Cerulean Simulations and Games",
           copyright: "2015-#{Time.now.year}",
-          height_percent: 0.10
+          height_percent: 0.10,
+          background_color: 0xd0a0b0c0
         )
       end
 
       def sidebar(sections)
         @sidebar ||= ApplicationSidebar.new(
           library_section_tab_molecules: section_tabs(sections),
-          width_percent: 0.35
+          width_percent: 0.4,
+          background_color: 0xa0a0a0a0
         )
       end
 
@@ -158,6 +161,10 @@ module Dedalus
         @template = template
       end
 
+      def padding
+        0
+      end
+
       def show
         @template.layout(library_sections: @library_sections) do
           current_section
@@ -171,7 +178,7 @@ module Dedalus
       end
 
       def background_color
-        0xa0a0a0a0
+        0x40a0a0a0
       end
 
       def current_section
@@ -183,10 +190,17 @@ module Dedalus
     class LibrarySectionOrganism < Dedalus::Organism
       def self.for(section_name)
         case section_name
-        when 'Atoms' then AtomSectionOrganism.new
         when 'Welcome' then WelcomeSectionOrganism.new
+        when 'Atoms' then AtomSectionOrganism.new
+        when 'Molecules' then MoleculeSectionOrganism.new
+        when 'Organisms' then OrganismSectionOrganism.new
+        when 'Templates' then TemplateSectionOrganism.new
         else raise "Unknown section #{section_name}"
         end
+      end
+
+      def background_color
+        0xa0a0a0a0
       end
       # ...
     end
@@ -221,6 +235,24 @@ module Dedalus
         [
           Elements::Paragraph.new(text: "Atoms are great!")
         ]
+      end
+    end
+
+    class MoleculeSectionOrganism < LibrarySectionOrganism
+      def show
+        [ Elements::Heading.new(text: "Molecules!") ]
+      end
+    end
+
+    class OrganismSectionOrganism < LibrarySectionOrganism
+      def show
+        [ Elements::Heading.new(text: "Organisms!") ]
+      end
+    end
+
+    class TemplateSectionOrganism < LibrarySectionOrganism
+      def show
+        [ Elements::Heading.new(text: "Templates!") ]
       end
     end
   end

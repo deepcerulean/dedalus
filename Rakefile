@@ -10,7 +10,6 @@ end
 
 require 'rake'
 
-
 require 'rubygems/tasks'
 Gem::Tasks.new
 
@@ -28,4 +27,16 @@ require 'cucumber/rake/task'
 
 Cucumber::Rake::Task.new do |t|
   t.cucumber_opts = %w[--format pretty]
+end
+
+require 'joyce'
+require 'joyce/tasks/build'
+
+task :app do
+  Joyce::Tasks::AppBuilder.new.make({
+    app_name: "dedalus",
+    app_class_name: 'Dedalus::PatternLibrary::Application',
+    template_location: "dist/Ruby.app",
+    target_directory: "dist"
+  })
 end

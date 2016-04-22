@@ -1,8 +1,8 @@
 require 'joyce'
 require 'geometer'
-require 'pry'
 
 require 'dedalus/version'
+require 'dedalus/view_traversal'
 require 'dedalus/app_view_composer'
 
 require 'dedalus/elements'
