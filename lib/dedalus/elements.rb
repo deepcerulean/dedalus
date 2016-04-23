@@ -1,11 +1,10 @@
 module Dedalus
-  # try to infer active screen
   def self.activate!(app_view)
-    @active_screen = app_view # Joyce::ApplicationView.descendants.first.current
+    @active_view = app_view
   end
 
-  def self.active_screen
-    @active_screen ||= nil
+  def self.active_view
+    @active_view ||= nil
   end
 
   class Element
@@ -21,13 +20,7 @@ module Dedalus
     attr_accessor :background_color
 
     def initialize(attrs={})
-      attrs.each { |(k,v)| instance_variable_set(:"@#{k}",v) }
-    end
-
-    # TODO remove screen attr everywhere...
-    # TODO rename, since this is really the app_view..?
-    def screen
-      Dedalus.active_screen
+      attrs.each { |(k,v)| instance_variable_set(:"@#{k}",v) } unless attrs.nil?
     end
 
     def draw_bounding_box(origin:, dimensions:, color: 0x70f0f0f0, highlight: false)
@@ -36,10 +29,22 @@ module Dedalus
 
       color = 0xa0f0f0f0 if highlight
 
-      screen.window.draw_quad(x,y,color,
-                              x,y+h,color,
-                              x+w,y,color,
-                              x+w,y+h,color,ZOrder::Background)
+      window.draw_quad(x,y,color,
+                       x,y+h,color,
+                       x+w,y,color,
+                       x+w,y+h,color,ZOrder::Background)
+    end
+
+    def view
+      Dedalus.active_view
+    end
+
+    def font
+      view.font
+    end
+
+    def window
+      view.window
     end
   end
 
@@ -50,6 +55,11 @@ module Dedalus
   end
 
   class Molecule < Element
+    def click
+    end
+
+    def hover
+    end
   end
 
   class Organism < Element

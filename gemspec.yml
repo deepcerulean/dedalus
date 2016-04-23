@@ -1,6 +1,6 @@
 name: dedalus
-summary: "TODO: Summary"
-description: "TODO: Description"
+summary: atomic patterns for 2d games
+description: atomic ui pattern library toolkit for joyce
 license: MIT
 authors: Joseph Weissman
 email: jweissman1986@gmail.com
@@ -8,6 +8,7 @@ homepage: https://rubygems.org/gems/dedalus
 
 dependencies:
   joyce: ~> 0.1
+  geometer: ~> 0.1
 
 development_dependencies:
   bundler: ~> 1.10

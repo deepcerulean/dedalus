@@ -73,11 +73,12 @@ module Dedalus
     end
 
     def subdivide_line(elements, distance:, attr:)
+      percent_attr = :"#{attr}_percent"
       elements_with_relative_hints = elements.select do |element|
         if element.is_a?(Array)
           false
         else
-          !element.send(:"#{attr}_percent").nil?
+          !element.send(percent_attr).nil?
         end
       end
 
@@ -91,7 +92,7 @@ module Dedalus
 
       elements_with_hints = elements_with_relative_hints + elements_with_absolute_hints
       distance_specified_by_hints =
-        (elements_with_relative_hints.sum(&:"#{attr}_percent") * distance) +
+        (elements_with_relative_hints.sum(&percent_attr) * distance) +
         (elements_with_absolute_hints.sum(&attr))
 
       default_element_section_distance = (distance - distance_specified_by_hints) / (elements.length - elements_with_hints.length)
@@ -103,8 +104,8 @@ module Dedalus
         else
           if !element.send(attr).nil?
             element.send(attr)
-          elsif !element.send(:"#{attr}_percent").nil?
-            element.send(:"#{attr}_percent") * distance
+          elsif !element.send(percent_attr).nil?
+            element.send(percent_attr) * distance
           else
             default_element_section_distance
           end

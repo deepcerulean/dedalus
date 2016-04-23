@@ -12,28 +12,38 @@ module Dedalus
       def render
         screen = app_screen
 
-        screen = composer.hover_molecule(screen, [window.width, window.height], mouse_position: mouse_position)
+        screen = composer.hover_molecule(screen, [window.width, window.height], mouse_position: adjusted_mouse_position)
         composer.render!(screen, [ window.width, window.height ])
 
-        cursor.position = mouse_position
+        cursor.position = adjusted_mouse_position
         cursor.render
       end
 
       def click
         p [ :app_view_click ]
         # TODO cascade click through whole strucutre? need to even click atoms maybe...?
-        composer.click_molecule(app_screen, [window.width, window.height], mouse_position: mouse_position)
+        composer.click_molecule(app_screen, [window.width, window.height], mouse_position: adjusted_mouse_position)
+      end
+
+      def adjusted_mouse_position
+        if @application.window.fullscreen?
+          x0,y0 = *mouse_position
+          [ x0 * 2, y0 * 2 ]
+        else
+          mouse_position
+        end
       end
 
       def app_screen
-        ApplicationTemplate.new.to_screen(
-          library_sections: [welcome_tab] + library_view.library_section_tabs,
-          current_section_name: current_section
+        ApplicationScreen.new(app_template).hydrate(
+          library_section_tabs: library_view.library_section_tabs,
+          current_section_name: current_section,
+          library_sections: library_view.library_sections
         )
       end
 
-      def welcome_tab
-        { name: "Welcome", icon: :house, description: "About Dedalus", background_color: 0x70a0c0d0 }
+      def app_template
+        ApplicationTemplate.new
       end
 
       def current_section

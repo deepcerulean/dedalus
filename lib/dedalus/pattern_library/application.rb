@@ -12,6 +12,13 @@ module Dedalus
       def setup
         library = Library.create(name: "Dedalus Pattern Library")
 
+        library.create_library_section(
+          name: "Welcome",
+          icon: :house,
+          color: 'gray',
+          about: "About the Dedalus library"
+        )
+
         atom_section = library.create_library_section(
           name: "Atoms",
           icon: :atom,
@@ -22,7 +29,17 @@ module Dedalus
         atom_section.create_library_item(
           name: "Paragraph",
           kind: "Atom",
-          description: "A block of text"
+          description: "A block of text",
+          item_class_name: "Dedalus::Elements::Paragraph",
+          example_data: { text: "Hello World" }
+        )
+
+        atom_section.create_library_item(
+          name: "Icon",
+          kind: "Atom",
+          description: "A recognizable symbol",
+          item_class_name: "Dedalus::Elements::Icon",
+          example_data: { name: "house" }
         )
 
         library.create_library_section(
@@ -54,12 +71,22 @@ module Dedalus
             {
               title: section.name,
               subtitle: section.about,
-              color: section.color
+              color: section.color,
+              items: section.library_items.map do |item|
+                {
+                  name: item.name,
+                  kind: item.kind,
+                  description: item.description,
+                  item_class_name: item.item_class_name,
+                  item_data: item.example_data
+                }
+              end
             }
           end,
 
           library_section_tabs: library.library_sections.map do |section|
-            { name: section.name,
+            { 
+              name: section.name,
               icon: section.icon,
               description: section.about,
               section_color: section.color

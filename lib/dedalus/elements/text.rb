@@ -3,9 +3,6 @@ module Dedalus
     class Text < Dedalus::Atom
       attr_accessor :text, :scale, :padding
 
-      def font
-        screen.font
-      end
 
       def render(*)
         x,y = *position
