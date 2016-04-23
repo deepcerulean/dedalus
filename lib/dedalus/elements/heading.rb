@@ -2,11 +2,11 @@ module Dedalus
   module Elements
     class Heading < Text
       def scale
-        @scale ||= 1.0
+        @scale ||= 2.4
       end
 
       def padding
-        @padding ||= 10.0
+        @padding ||= 4.0
       end
     end
   end

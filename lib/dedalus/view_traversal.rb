@@ -28,17 +28,23 @@ module Dedalus
         @atom_callback.call(structure, origin: origin, dimensions: dimensions) if @atom_callback
       elsif structure.is_a?(Dedalus::Element)
         # an element *other than* an atom, we need to call #show on it
-        pad = structure.padding || 0.0
-        pad_origin = [x0 + pad, y0 + pad ]
-        pad_dims = [width - pad*2, height - pad*2 ]
+        margin = structure.margin || 0.0
+        x,y = x0 + margin, y0 + margin
+        margin_origin = [ x, y ]
+        margin_dims = [ width - margin*2, height - margin*2 ]
 
         if structure.is_a?(Dedalus::Molecule) && @molecule_callback
-          @molecule_callback.call(structure, origin: pad_origin, dimensions: pad_dims)
+          @molecule_callback.call(structure, origin: margin_origin, dimensions: margin_dims)
         end
 
         if @element_callback
-          @element_callback.call(structure, origin: pad_origin, dimensions: pad_dims)
+          @element_callback.call(structure, origin: margin_origin, dimensions: margin_dims)
         end
+
+        pad = structure.padding || 10.0
+        # x,y = x0+pad, y0+pad
+        pad_origin = [x+pad,y+pad]
+        pad_dims = [width - pad*2 - margin*2, height - pad*2 - margin*2 ]
 
         walk!(structure.show, origin: pad_origin, dimensions: pad_dims)
       elsif structure.is_a?(Array) # we have a set of rows
@@ -75,6 +81,9 @@ module Dedalus
     def subdivide_line(elements, distance:, attr:)
       percent_attr = :"#{attr}_percent"
       elements_with_relative_hints = elements.select do |element|
+        # if element.is_a?(Hash)
+        #   require 'pry'
+        #   binding.pry
         if element.is_a?(Array)
           false
         else

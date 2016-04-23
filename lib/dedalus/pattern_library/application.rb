@@ -10,6 +10,14 @@ module Dedalus
       end
 
       def setup
+        create_library
+      end
+
+      def find_descendants_of(klass)
+        ObjectSpace.each_object(Class).select { |k| k < klass && find_descendants_of(k).count.zero? }
+      end
+
+      def create_library
         library = Library.create(name: "Dedalus Pattern Library")
 
         library.create_library_section(
@@ -26,36 +34,29 @@ module Dedalus
           about: "Components that can't be split further"
         )
 
-        atom_section.create_library_item(
-          name: "Paragraph",
-          kind: "Atom",
-          description: "A block of text",
-          item_class_name: "Dedalus::Elements::Paragraph",
-          example_data: { text: "Hello World" }
-        )
+        atom_classes = find_descendants_of(Dedalus::Atom)
+        atom_section.build_items_from_classes(atom_classes)
 
-        atom_section.create_library_item(
-          name: "Icon",
-          kind: "Atom",
-          description: "A recognizable symbol",
-          item_class_name: "Dedalus::Elements::Icon",
-          example_data: { name: "house" }
-        )
-
-        library.create_library_section(
+        molecules_section = library.create_library_section(
           name: "Molecules",
           icon: :molecule,
           color: 'yellow',
           about: "Simple compounds of a few atoms"
         )
 
-        library.create_library_section({
+        molecule_classes = find_descendants_of(Dedalus::Molecule)
+        molecules_section.build_items_from_classes molecule_classes
+        
+        organism_section = library.create_library_section({
           name: "Organisms",
           icon: :paramecium,
           color: 'green',
           about: "Highly-complex assemblages of molecules"
         })
 
+        organism_classes = find_descendants_of(Dedalus::Organism)
+        organism_section.build_items_from_classes organism_classes
+        
         library.create_library_section({
           name: "Templates",
           icon: :hive,
@@ -64,7 +65,7 @@ module Dedalus
 
         # just manually create a view from models for now...
 
-        view.create_library_view(
+        view.library_view = LibraryView.create(
           library_name: library.name,
 
           library_sections: library.library_sections.map do |section|
@@ -75,7 +76,7 @@ module Dedalus
               items: section.library_items.map do |item|
                 {
                   name: item.name,
-                  kind: item.kind,
+                  # kind: item.kind,
                   description: item.description,
                   item_class_name: item.item_class_name,
                   item_data: item.example_data
@@ -85,7 +86,7 @@ module Dedalus
           end,
 
           library_section_tabs: library.library_sections.map do |section|
-            { 
+            {
               name: section.name,
               icon: section.icon,
               description: section.about,

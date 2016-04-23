@@ -19,8 +19,25 @@ module Dedalus
         2*padding + (font.height * scale)
       end
 
+      def padding
+        @padding ||= 10.0
+      end
+
+      def scale
+        @scale ||= 1.0
+      end
+
       def dimensions
         [ width, height ]
+      end
+
+      # sample data for the explorer...
+      def self.example_data
+        { text: "Hello World" }
+      end
+
+      def self.description
+        "words"
       end
     end
   end

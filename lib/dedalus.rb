@@ -1,11 +1,10 @@
 require 'joyce'
 require 'geometer'
 
-require 'pry' # FIXME can't be in the build
-
 require 'dedalus/version'
 require 'dedalus/view_traversal'
 require 'dedalus/app_view_composer'
+require 'dedalus/application_view'
 
 require 'dedalus/palette'
 
@@ -28,6 +27,7 @@ require 'dedalus/pattern_library/molecules/library_item_example'
 require 'dedalus/pattern_library/organisms/app_header'
 require 'dedalus/pattern_library/organisms/app_footer'
 require 'dedalus/pattern_library/organisms/app_sidebar'
+require 'dedalus/pattern_library/organisms/library_section'
 
 require 'dedalus/pattern_library/templates/app_template'
 

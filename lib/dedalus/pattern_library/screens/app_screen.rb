@@ -8,7 +8,7 @@ module Dedalus
       end
 
       def padding
-        0.2
+        40.2
       end
 
       def show
@@ -27,7 +27,7 @@ module Dedalus
       end
 
       def background_color
-        0x40a0a0a0
+        Palette.decode_color 'darkgray'
       end
     end
   end

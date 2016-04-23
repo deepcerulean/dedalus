@@ -1,5 +1,13 @@
 module Dedalus
   module Elements
+    class ImageRepository
+      def self.lookup(path)
+        @images ||= {}
+        @images[path] ||= Gosu::Image.new(path)
+        @images[path]
+      end
+    end
+
     class Image < Dedalus::Atom
       attr_accessor :path, :padding
 
@@ -24,9 +32,21 @@ module Dedalus
         @padding ||= 10.0
       end
 
+      def scale
+        @scale ||= 1.0
+      end
+
+      def self.example_data
+        { path: "media/icons/house.png" }
+      end
+
+      def self.description
+        "an image"
+      end
+
       private
       def asset
-        @asset ||= Gosu::Image.new(path)
+        @asset ||= ImageRepository.lookup(path)
       end
     end
   end

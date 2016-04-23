@@ -16,23 +16,24 @@ module Dedalus
     # raw width/height
     attr_accessor :width, :height
 
-    attr_accessor :padding
+    attr_accessor :padding, :margin
     attr_accessor :background_color
 
     def initialize(attrs={})
       attrs.each { |(k,v)| instance_variable_set(:"@#{k}",v) } unless attrs.nil?
     end
 
-    def draw_bounding_box(origin:, dimensions:, color: 0x70f0f0f0, highlight: false)
+    def draw_bounding_box(origin:, dimensions:, color: Palette.gray) #, highlight: false)
       x,y = *origin
       w,h = *dimensions
 
-      color = 0xa0f0f0f0 if highlight
+      raise "Invalid color #{color} given to #{self.class.name} for bounding box" unless color.is_a?(Dedalus::Color)
 
-      window.draw_quad(x,y,color,
-                       x,y+h,color,
-                       x+w,y,color,
-                       x+w,y+h,color,ZOrder::Background)
+      c = color.to_gosu
+      window.draw_quad(x,y,c,
+                       x,y+h,c,
+                       x+w,y,c,
+                       x+w,y+h,c,ZOrder::Background)
     end
 
     def view

@@ -1,26 +1,89 @@
 module Dedalus
-  class Palette
-    def self.decode_color(color)
+  class Color
+    attr_accessor :red, :green, :blue, :alpha
+
+    def initialize(red,green,blue,alpha=255)
+      @red = red
+      @green = green
+      @blue = blue
+      @alpha = alpha
+    end
+
+    # def mix(other_color)
+    #   Color.new( 
+    #             (red+other_color.red/2), 
+    #             (green+other_color.green/2),
+    #             (blue+other_color.blue/2)
+    #            )
+    # end
+
+    def darken(ratio=0.95)
+      Color.new(red*ratio,green*ratio,blue*ratio)
+    end
+
+    def lighten(ratio=1.05)
+      Color.new(red*ratio,green*ratio,blue*ratio)
+    end
+
+    def to_gosu
+      Gosu::Color.rgba(red, green, blue, alpha)
+    end
+  end
+
+  class ColorPalette
+    attr_accessor :red, :green, :blue, :yellow, :purple, :gray, :white
+    def initialize(red:, green:, blue:, yellow:, purple:, gray:, white: Color.new(240,240,240))
+      @red = red
+      @green = green
+      @blue = blue
+      @yellow = yellow
+      @purple = purple
+      @gray = gray
+      @white = white
+    end
+
+    def decode_color(color)
+      return color if color.is_a?(Dedalus::Color)
+
       case color
-      when 'red' then 0xffb2543d
-      when 'lightred' then 0xffb96045
-      when 'darkred' then 0xffa4482c
+      when 'red' then red
+      when 'lightred' then red.lighten
+      when 'darkred' then red.darken
 
-      when 'green' then 0xff72933c
-      when 'lightgreen' then 0xfea1b35c
+      when 'green' then green
+      when 'lightgreen' then green.lighten
+      when 'darkgreen' then green.darken
 
-      when 'blue' then 0xff678ebb
-      when 'lightblue' then 0xff779ecb
+      when 'blue' then blue
+      when 'lightblue' then blue.lighten
+      when 'darkblue' then blue.darken
 
-      when 'yellow' then 0xffbFa86B
-      when 'lightyellow' then 0xffdFd89B
+      when 'yellow' then yellow
+      when 'lightyellow' then yellow.lighten
+      when 'darkyellow' then yellow.darken
 
-      when 'gray' then 0xff707070
-      when 'lightgray' then 0xffa0a0a0
-      when 'darkgray' then 0xf0404040
+      when 'gray' then gray
+      when 'lightgray' then gray.lighten
+      when 'darkgray' then gray.darken
 
-      else 0x00f0f0f0
+      when 'purple' then purple
+      when 'lightpurple' then purple.lighten
+      when 'darkpurple' then purple.darken
+
+      else 
+        raise "Unknown color string given to #{self.class.name}#decode_color: #{color}"
       end
     end
   end
+
+  DesaturatedPalette = ColorPalette.new(
+    red: Color.new(140, 100, 100),
+    green: Color.new(100, 140, 100),
+    blue: Color.new(100, 100, 140),
+    yellow: Color.new(220, 200, 140),
+    purple: Color.new(140, 100, 140),
+    gray: Color.new(80, 80, 80)
+  )
+
+  Palette = DesaturatedPalette 
 end

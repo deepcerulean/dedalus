@@ -22,7 +22,7 @@ module Dedalus
           title: 'Dedalus',
           subtitle: 'A Visual Pattern Library for Joyce',
           height_percent: 0.15,
-          background_color: 0xa0c0d0e0
+          background_color: Palette.blue
         )
       end
 
@@ -33,22 +33,22 @@ module Dedalus
           company: "Deep Cerulean Simulations and Games",
           copyright: "2015-#{Time.now.year}",
           height_percent: 0.10,
-          background_color: 0xd0a0b0c0
+          background_color: Palette.decode_color('darkgreen')
         )
       end
 
       def sidebar(sections, current_section_name)
         @sidebar ||= ApplicationSidebar.new(
           library_section_tab_molecules: section_tabs(sections, current_section_name),
-          width_percent: 0.4,
-          background_color: 0x60a0a0a0
+          width_percent: 0.2,
+          background_color: Palette.decode_color('darkgray')
         )
       end
 
       def section_tabs(sections, current_section_name)
         sections.map do |attrs|
           highlight = attrs[:name] == current_section_name
-          LibrarySectionTabMolecule.new(attrs.merge(highlight: highlight))
+          LibrarySectionTab.new(attrs.merge(highlight: highlight))
         end
       end
     end

@@ -1,6 +1,6 @@
 module Dedalus
   module PatternLibrary
-    class LibrarySectionTabMolecule < Dedalus::Molecule
+    class LibrarySectionTab < Dedalus::Molecule
       attr_accessor :icon, :name, :description, :scale, :highlight, :section_color
 
       def show
@@ -28,8 +28,8 @@ module Dedalus
         @scale ||= 0.0
       end
 
-      def height_percent
-        0.15
+      def height
+        @height ||= 100
       end
 
       def icon_element
@@ -37,11 +37,25 @@ module Dedalus
       end
 
       def title_element
-        Elements::Heading.new(text: name, scale: 0.6 + scale)
+        Elements::Heading.new(text: name, scale: 1.8 + scale)
       end
 
       def description_element
-        Elements::Paragraph.new(text: description, scale: 0.5)
+        Elements::Paragraph.new(text: description)
+      end
+
+      def self.description
+        "navigational tab"
+      end
+
+      def self.example_data
+        {
+          icon: :house,
+          name: "Welcome",
+          description: "Hello world (links to Welcome)",
+          highlight: false,
+          section_color: 'lightyellow'
+        }
       end
     end
   end

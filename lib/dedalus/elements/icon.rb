@@ -13,9 +13,7 @@ module Dedalus
 
       class << self
         def for(sym, attrs={})
-          @icon_set ||= {}
-          @icon_set[sym] ||= new(name: sym) #
-          @icon_set[sym]
+          new(attrs.merge(name: sym))
         end
       end
     end

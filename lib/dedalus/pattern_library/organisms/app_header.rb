@@ -10,6 +10,18 @@ module Dedalus
         ]
       end
 
+      def padding
+        20
+      end
+
+      def self.description
+        "An application header"
+      end
+
+      def self.example_data
+        { title: "Fake app", description: "Hello world" }
+      end
+
       private
       def heading
         @heading ||= Elements::Heading.new(text: title)
