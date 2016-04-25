@@ -16,8 +16,8 @@ module Dedalus
       end
 
       def background_color
-        color = self.highlight ? "light#{@section_color}" : @section_color
-        Palette.decode_color(color)
+        bg = Palette.decode_color(section_color)
+        self.highlight ? bg.lighten : bg
       end
 
       def click
@@ -29,11 +29,11 @@ module Dedalus
       end
 
       def height
-        @height ||= 100
+        @height ||= 80
       end
 
       def icon_element
-        Elements::Icon.for(icon, padding: 20)
+        Elements::Icon.for(icon, padding: 16)
       end
 
       def title_element
@@ -54,7 +54,7 @@ module Dedalus
           name: "Welcome",
           description: "Hello world (links to Welcome)",
           highlight: false,
-          section_color: 'lightyellow'
+          section_color: 'gray'
         }
       end
     end

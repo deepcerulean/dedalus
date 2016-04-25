@@ -1,28 +1,23 @@
 module Dedalus
   module PatternLibrary
     class ApplicationScreen < Dedalus::Screen
-      attr_reader :library_section_tabs, :current_section_name, :library_sections
-
       def initialize(template)
         @template = template
       end
 
       def padding
-        40.2
+        20
       end
 
       def show
-        @template.layout(
-          library_section_tabs: @library_section_tabs,
-          current_section_name: @current_section_name,
-          library_sections: @library_sections
-        )
+        @template.show
       end
 
-      def hydrate(library_section_tabs:, current_section_name:, library_sections:)
-        @library_section_tabs = library_section_tabs
-        @current_section_name = current_section_name
-        @library_sections = library_sections
+      def hydrate(library_section_tabs:, current_entry_name:, library_sections:, library_items:)
+        @template.library_section_tabs = library_section_tabs
+        @template.current_entry_name = current_entry_name
+        @template.library_sections = library_sections
+        @template.library_items = library_items
         self
       end
 

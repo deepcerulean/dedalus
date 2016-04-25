@@ -8,12 +8,13 @@ module Dedalus
       def show
         [
           Elements::Paragraph.new(text: "EXAMPLE", scale: 0.5, height_percent: 0.05, background_color: color.darken.darken),
-          item
+          item,
+          Elements::Paragraph.new(text: item_data, scale: 0.7, background_color: Palette.decode_color('darkgray'), padding: 10)
         ]
       end
 
       def item
-        item_class.new(item_data) #.merge(height_percent: 0.99))
+        item_class.new(item_data)
       end
 
       def width_percent
@@ -25,7 +26,7 @@ module Dedalus
       end
 
       def self.description
-        "an example of a patten"
+        "an example of a pattern"
       end
 
       def self.example_data

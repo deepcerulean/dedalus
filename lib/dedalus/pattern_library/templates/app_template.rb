@@ -1,20 +1,34 @@
 module Dedalus
   module PatternLibrary
     class ApplicationTemplate < Dedalus::Template
-      def layout(library_section_tabs:, current_section_name:, library_sections:)
+      attr_accessor :library_section_tabs, :current_entry_name, :library_sections, :library_items
+
+      def show
+        layout do
+          library_page(library_sections, library_items, current_entry_name)
+        end
+      end
+
+      def layout
         [
           app_header,
-          [ 
-            sidebar(library_section_tabs, current_section_name), library_page(library_sections, current_section_name) 
+          [
+            sidebar(library_section_tabs, library_items, current_entry_name),
+            yield
           ],
           app_footer
         ]
       end
 
       private
-      def library_page(sections, name)
-        current_section = sections.detect { |section| section[:title] == name }
-        LibrarySectionOrganism.new(current_section)
+      def library_page(sections, items, entry_name)
+        current_section = sections.detect { |section| section[:title] == entry_name } 
+        if current_section
+          LibraryEntry.new(current_section)
+        else
+          current_item = items.detect { |item| item[:name] == entry_name }
+          LibraryEntry.from_item(current_item)
+        end
       end
 
       def app_header
@@ -37,8 +51,8 @@ module Dedalus
         )
       end
 
-      def sidebar(sections, current_section_name)
-        @sidebar ||= ApplicationSidebar.new(
+      def sidebar(sections, items, current_section_name)
+        ApplicationSidebar.new(
           library_section_tab_molecules: section_tabs(sections, current_section_name),
           width_percent: 0.2,
           background_color: Palette.decode_color('darkgray')

@@ -17,11 +17,11 @@ module Dedalus
     #            )
     # end
 
-    def darken(ratio=0.95)
+    def darken(ratio=0.90)
       Color.new(red*ratio,green*ratio,blue*ratio)
     end
 
-    def lighten(ratio=1.05)
+    def lighten(ratio=1.10)
       Color.new(red*ratio,green*ratio,blue*ratio)
     end
 
@@ -80,7 +80,7 @@ module Dedalus
     red: Color.new(140, 100, 100),
     green: Color.new(100, 140, 100),
     blue: Color.new(100, 100, 140),
-    yellow: Color.new(220, 200, 140),
+    yellow: Color.new(150, 140, 100),
     purple: Color.new(140, 100, 140),
     gray: Color.new(80, 80, 80)
   )

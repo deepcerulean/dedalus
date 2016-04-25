@@ -22,6 +22,8 @@ module Dedalus
 
     def walk!(structure, origin:, dimensions:)
       width, height = *dimensions
+      height = structure.height if !structure.is_a?(Array) && structure.height
+      width = structure.width if !structure.is_a?(Array) && structure.width
       x0, y0 = *origin
 
       if structure.is_a?(Dedalus::Atom)

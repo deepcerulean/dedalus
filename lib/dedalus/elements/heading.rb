@@ -6,7 +6,7 @@ module Dedalus
       end
 
       def padding
-        @padding ||= 4.0
+        @padding ||= 2.0
       end
     end
   end

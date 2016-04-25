@@ -20,7 +20,7 @@ module Dedalus
       end
 
       def padding
-        @padding ||= 10.0
+        @padding ||= 0.0
       end
 
       def scale
