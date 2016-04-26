@@ -1,6 +1,5 @@
 module Dedalus
   class ViewTraversal
-
     include Geometer::PointHelpers
     include Geometer::DimensionHelpers
 
@@ -48,6 +47,7 @@ module Dedalus
         pad_origin = [x+pad,y+pad]
         pad_dims = [width - pad*2 - margin*2, height - pad*2 - margin*2 ]
 
+
         walk!(structure.show, origin: pad_origin, dimensions: pad_dims)
       elsif structure.is_a?(Array) # we have a set of rows
         walk_rows!(structure, origin: origin, dimensions: dimensions)
@@ -83,9 +83,6 @@ module Dedalus
     def subdivide_line(elements, distance:, attr:)
       percent_attr = :"#{attr}_percent"
       elements_with_relative_hints = elements.select do |element|
-        # if element.is_a?(Hash)
-        #   require 'pry'
-        #   binding.pry
         if element.is_a?(Array)
           false
         else
@@ -101,12 +98,14 @@ module Dedalus
         end
       end
 
-      elements_with_hints = elements_with_relative_hints + elements_with_absolute_hints
+      elements_with_hints = (elements_with_relative_hints + elements_with_absolute_hints).uniq
       distance_specified_by_hints =
         (elements_with_relative_hints.sum(&percent_attr) * distance) +
         (elements_with_absolute_hints.sum(&attr))
 
-      default_element_section_distance = (distance - distance_specified_by_hints) / (elements.length - elements_with_hints.length)
+      if elements_with_hints.length < elements.length
+        default_element_section_distance = (distance - distance_specified_by_hints) / (elements.length - elements_with_hints.length)
+      end
 
       distance_cursor = 0
       elements.each_with_index do |element, index|

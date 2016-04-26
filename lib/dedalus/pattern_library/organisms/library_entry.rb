@@ -1,7 +1,7 @@
 module Dedalus
   module PatternLibrary
     class LibraryEntry < Dedalus::Organism
-      attr_accessor :title, :subtitle, :description, :color, :items, :item
+      attr_accessor :title, :subtitle, :description, :color, :items, :item, :show_table
 
       def self.from_item(item)
         new(title: item[:name], subtitle: item[:description], item: item)
@@ -17,22 +17,18 @@ module Dedalus
 
       def library_items
         if items
-          items.map do |name:,  description:, item_class_name:, item_data:|
-            PeriodicTableEntry.new(
-              element_name: name,
-              color: background_color
-            )
+          if show_table
+            PeriodicTable.new(elements: items)
+          else # items
+            items.map do |name:, description:, item_class_name:, item_data:, kind:, color:|
+              PeriodicTableEntry.new(
+                element_name: name,
+                color: color,
+                kind: kind)
+            end
           end
         elsif item
-          LibraryItemMolecule.new(item.merge(color: background_color))
-          #   name: name,
-          #   # kind: kind,
-          #   description: description,
-          #   item_data: item_data,
-          #   item_class_name: item_class_name,
-          #   color: background_color.darken
-          # )
-          #item
+          LibraryItemExample.new(item)
         else
           []
         end
@@ -45,8 +41,8 @@ module Dedalus
       def background_color
         if color
           Palette.decode_color(color).lighten
-        else
-          Palette.gray
+        elsif item && item[:color]
+          Palette.decode_color(item[:color])
         end
       end
 
@@ -60,8 +56,7 @@ module Dedalus
           subtitle: "world",
           description: "Welcome to this section",
           color: "darkblue",
-          # padding: 0,
-          items: [ LibraryItemMolecule.example_data ]
+          items: [ LibraryItemExample.example_data ]
         }
       end
     end

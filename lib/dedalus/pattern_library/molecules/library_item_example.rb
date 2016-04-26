@@ -1,20 +1,22 @@
 module Dedalus
   module PatternLibrary
     class LibraryItemExample < Dedalus::Molecule
-      attr_accessor :item_class
+      attr_accessor :name
+      attr_accessor :item_class_name
       attr_accessor :item_data
+      attr_accessor :kind
       attr_accessor :color
 
       def show
         [
-          Elements::Paragraph.new(text: "EXAMPLE", scale: 0.5, height_percent: 0.05, background_color: color.darken.darken),
+          Elements::Paragraph.new(text: "EXAMPLE", scale: 0.5, height_percent: 0.05, background_color: background_color.darken),
           item,
           Elements::Paragraph.new(text: item_data, scale: 0.7, background_color: Palette.decode_color('darkgray'), padding: 10)
         ]
       end
 
       def item
-        item_class.new(item_data)
+        item_class_name.constantize.new(item_data)
       end
 
       def width_percent
@@ -22,7 +24,11 @@ module Dedalus
       end
 
       def background_color
-        color.darken
+        if color
+          Palette.decode_color(color).darken
+        else
+          Palette.gray
+        end
       end
 
       def self.description
@@ -30,7 +36,14 @@ module Dedalus
       end
 
       def self.example_data
-        { item_class: Dedalus::Elements::Heading, item_data: { text: "Hi!" }, color: Palette.red }
+        {
+          name: "Paragraph",
+          description: "fake library item molecule",
+          item_class_name: 'Dedalus::Elements::Paragraph',
+          item_data: { text: "Hi there!" },
+          color: 'red', #Palette.red,
+          kind: 'Atom'
+        }
       end
     end
   end

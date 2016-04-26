@@ -18,6 +18,8 @@ module Dedalus
       def self.example_data
         {
           library_section_tab_molecules: [
+            LibrarySectionTab.new(LibrarySectionTab.example_data),
+            LibrarySectionTab.new(LibrarySectionTab.example_data),
             LibrarySectionTab.new(LibrarySectionTab.example_data)
           ]
         }

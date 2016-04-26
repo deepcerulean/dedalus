@@ -15,7 +15,7 @@ module Dedalus
       traverse(structure, origin: [0,0], dimensions: window_dims) do
         on_molecule do |molecule, origin:, dimensions:|
           element_bounding_box = Geometer::Rectangle.new(coord(*origin), dim(*dimensions))
-        mouse_overlap = element_bounding_box.contains?(mouse_coord) rescue false # could get bad coords...
+          mouse_overlap = element_bounding_box.contains?(mouse_coord) rescue false # could get bad coords...
           if mouse_overlap
             molecule.send(message)
           end
@@ -28,7 +28,6 @@ module Dedalus
     end
 
     def click_molecule(structure, window_dims, mouse_position:)
-      # p [ :CLICK_MOLECULE ]
       send_molecule(structure, window_dims, mouse_position: mouse_position, message: :click)
     end
 

@@ -57,14 +57,16 @@ module Dedalus
           about: "Assembled screens with placeholders"})
 
         template_section.create_library_item({
-          name: "App Template",
+          name: "Library Template",
           item_class_name: 'Dedalus::PatternLibrary::ApplicationTemplate',
-          description: "ui library app",
-          example_data: {
-            library_name: "Ipsum Librarum",
-            library_sections: [ LibraryEntry.example_data ],
-            library_section_tabs: [ LibrarySectionTab.example_data ]
-          }
+          description: "ui library app template",
+          example_data: ApplicationTemplate.example_data
+          #   library_name: "Ipsum Librarum",
+          #   library_sections: [ welcome_section ], #, LibraryEntry.example_data ],
+          #   library_section_tabs: [ LibrarySectionTab.example_data ],
+          #   library_items: [], # LibraryItemExample.example_data ],
+          #   current_entry_name: 'Welcome'
+          # }
         })
 
         # just manually create a view from models for now...
@@ -85,6 +87,8 @@ module Dedalus
               items: section.library_items.map do |item|
                 {
                   name: item.name,
+                  kind: item.kind,
+                  color: section.color,
                   description: item.description,
                   item_class_name: item.item_class_name,
                   item_data: item.example_data
@@ -120,6 +124,7 @@ module Dedalus
           title: "Welcome",
           subtitle: "About the Dedalus library",
           color: 'darkgray',
+          show_table: true,
           items: all_library_items
         }
       end
@@ -128,6 +133,8 @@ module Dedalus
         LibraryItem.all.map do |item|
           {
             name: item.name,
+            kind: item.kind,
+            color: item.color,
             description: item.description,
             item_class_name: item.item_class_name,
             item_data: item.example_data

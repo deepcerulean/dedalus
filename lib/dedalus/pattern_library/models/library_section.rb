@@ -8,11 +8,13 @@ module Dedalus
 
         def build_items_from_classes(klasses, kind:)
           klasses.each do |klass|
-            name = klass.name.to_s
+            item_name = klass.name.to_s
+
             create_library_item(
-              name: name.demodulize.titleize,
+              name: item_name.demodulize.titleize,
+              color: self.color,
               kind: kind,
-              item_class_name: name,
+              item_class_name: item_name,
               description: klass.description,
               example_data: klass.example_data
             )

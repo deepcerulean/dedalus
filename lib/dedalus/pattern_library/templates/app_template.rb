@@ -1,39 +1,61 @@
 module Dedalus
   module PatternLibrary
     class ApplicationTemplate < Dedalus::Template
-      attr_accessor :library_section_tabs, :current_entry_name, :library_sections, :library_items
+      attr_accessor :library_name, :library_section_tabs, :current_entry_name
+      attr_accessor :library_sections, :library_items
 
       def show
         layout do
-          library_page(library_sections, library_items, current_entry_name)
+          library_page
         end
       end
 
       def layout
         [
           app_header,
-          [
-            sidebar(library_section_tabs, library_items, current_entry_name),
-            yield
-          ],
-          app_footer
+          [ sidebar, yield ]
+          # app_footer
         ]
       end
 
+      def self.example_data
+        {
+          library_name: "Ipsum Librarum",
+          library_sections: [ {
+            title: "Welcome",
+            subtitle: "Fake section",
+            color: 'blue',
+            show_table: false,
+            items: []
+          } ], #, LibraryEntry.example_data ],
+          library_section_tabs: [ LibrarySectionTab.example_data ],
+          library_items: [], # LibraryItemExample.example_data ],
+          current_entry_name: 'Welcome'
+        }
+      end
+
       private
-      def library_page(sections, items, entry_name)
-        current_section = sections.detect { |section| section[:title] == entry_name } 
+      def library_page
         if current_section
           LibraryEntry.new(current_section)
-        else
-          current_item = items.detect { |item| item[:name] == entry_name }
+        elsif current_item
           LibraryEntry.from_item(current_item)
+        else
+          Elements::Paragraph.new(text: "no page selected")
         end
+      end
+
+      def current_section
+        library_sections.detect { |section| section[:title] == current_entry_name }
+      end
+
+      def current_item
+        library_items.detect { |item| item[:name] == current_entry_name }
       end
 
       def app_header
         ApplicationHeader.new(
-          title: 'Dedalus',
+          title: library_name,
           subtitle: 'A Visual Pattern Library for Joyce',
           height_percent: 0.15,
           background_color: Palette.blue
@@ -51,19 +73,21 @@ module Dedalus
         )
       end
 
-      def sidebar(sections, items, current_section_name)
+      def sidebar
         ApplicationSidebar.new(
-          library_section_tab_molecules: section_tabs(sections, current_section_name),
+          library_section_tab_molecules: section_tabs,
           width_percent: 0.2,
           background_color: Palette.decode_color('darkgray')
         )
       end
 
-      def section_tabs(sections, current_section_name)
-        sections.map do |attrs|
-          highlight = attrs[:name] == current_section_name
+      def section_tabs
+        tab_list = library_section_tabs.map do |attrs|
+          highlight = attrs[:name] == current_entry_name
           LibrarySectionTab.new(attrs.merge(highlight: highlight))
         end
+        # p [ tab_list: tab_list ]
+        tab_list
       end
     end
   end
