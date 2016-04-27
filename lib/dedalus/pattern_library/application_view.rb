@@ -3,15 +3,6 @@ module Dedalus
     class ApplicationView < Dedalus::ApplicationView
       attr_accessor :library_view
 
-      def render
-        compose(app_screen)
-      end
-
-      def click
-        p [ :app_view_click ]
-        composer.click_molecule(app_screen, [window.width, window.height], mouse_position: mouse_position)
-      end
-
       def app_screen
         ApplicationScreen.new(app_template).hydrate(
           library_section_tabs: library_view.library_section_tabs,

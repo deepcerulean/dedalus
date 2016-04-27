@@ -9,15 +9,15 @@ module Dedalus
         view.click
       end
 
-      def setup
-        create_library
+      def setup(module_to_search:)
+        create_library(module_to_search)
       end
 
-      def find_descendants_of(klass)
-        ObjectSpace.each_object(Class).select { |k| k < klass && find_descendants_of(k).count.zero? }
+      def find_descendants_of(klass, module_to_search)
+        ObjectSpace.each_object(Class).select { |k| k < klass && find_descendants_of(k, module_to_search).count.zero? && k.name.deconstantize == module_to_search.name }
       end
 
-      def create_library
+      def create_library(module_to_search)
         library = Library.create(name: "Dedalus Pattern Library")
 
         atom_section = library.create_library_section(
@@ -27,7 +27,7 @@ module Dedalus
           about: "Components that can't be split further"
         )
 
-        atom_classes = find_descendants_of(Dedalus::Atom)
+        atom_classes = find_descendants_of(Dedalus::Atom, module_to_search)
         atom_section.build_items_from_classes(atom_classes, kind: 'atom')
 
         molecules_section = library.create_library_section(
@@ -37,7 +37,7 @@ module Dedalus
           about: "Simple compounds of a few atoms"
         )
 
-        molecule_classes = find_descendants_of(Dedalus::Molecule)
+        molecule_classes = find_descendants_of(Dedalus::Molecule, module_to_search)
         molecules_section.build_items_from_classes(molecule_classes, kind: 'molecule')
 
         organism_section = library.create_library_section({
@@ -47,7 +47,7 @@ module Dedalus
           about: "Highly-complex assemblages of molecules"
         })
 
-        organism_classes = find_descendants_of(Dedalus::Organism)
+        organism_classes = find_descendants_of(Dedalus::Organism, module_to_search)
         organism_section.build_items_from_classes(organism_classes, kind: 'organism')
 
         template_section = library.create_library_section({
@@ -61,12 +61,6 @@ module Dedalus
           item_class_name: 'Dedalus::PatternLibrary::ApplicationTemplate',
           description: "ui library app template",
           example_data: ApplicationTemplate.example_data
-          #   library_name: "Ipsum Librarum",
-          #   library_sections: [ welcome_section ], #, LibraryEntry.example_data ],
-          #   library_section_tabs: [ LibrarySectionTab.example_data ],
-          #   library_items: [], # LibraryItemExample.example_data ],
-          #   current_entry_name: 'Welcome'
-          # }
         })
 
         # just manually create a view from models for now...

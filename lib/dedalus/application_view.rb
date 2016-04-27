@@ -5,6 +5,15 @@ module Dedalus
       Dedalus.activate!(self)
     end
 
+    def render
+      compose(app_screen)
+    end
+
+    def click
+      p [ :app_view_click ]
+      composer.click_molecule(app_screen, [window.width, window.height], mouse_position: mouse_position)
+    end
+
     def compose(screen)
       screen = composer.hover_molecule(screen, dimensions, mouse_position: mouse_position)
       composer.render!(screen, dimensions)

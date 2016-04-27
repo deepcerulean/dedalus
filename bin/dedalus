@@ -6,7 +6,11 @@ if File.directory?(File.join(root,'.git'))
     begin
       require 'bundler/setup'
       require 'dedalus'
-      Dedalus::PatternLibrary::Application.kickstart!
+      Dedalus::PatternLibrary::Application.kickstart!({
+        setup: {
+          module_to_search: Dedalus::PatternLibrary
+        }
+      })
     rescue LoadError => e
       warn e.message
       warn "Run `gem install bundler` to install Bundler"
