@@ -8,7 +8,10 @@ describe Dedalus do
 end
 
 describe ApplicationViewComposer do
+  before { Dedalus.activate!(app_view) }
   subject(:composer) { ApplicationViewComposer.new }
+  let(:app_view) { instance_double(Dedalus::ApplicationView, font: font) }
+  let(:font) { instance_double(Gosu::Font, height: 10, text_width: 10) }
   describe "#render" do
     context "a single atom" do
       let(:atom) { Dedalus::Elements::Paragraph.new }
