@@ -37,9 +37,9 @@ module Dedalus
 
       def self.example_data
         {
-          name: "Paragraph",
-          description: "fake library item molecule",
-          item_class_name: 'Dedalus::Elements::Paragraph',
+          name: "Huge Text",
+          description: "(fake library item molecule)",
+          item_class_name: 'Dedalus::PatternLibrary::HugeText',
           item_data: { text: "Hi there!" },
           color: 'red', #Palette.red,
           kind: 'Atom'

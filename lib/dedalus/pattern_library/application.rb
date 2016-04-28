@@ -9,16 +9,16 @@ module Dedalus
         view.click
       end
 
-      def setup(module_to_search:)
-        create_library(module_to_search)
+      def setup(module_to_search:, library_name:)
+        create_library(name: library_name, module_to_search: module_to_search)
       end
 
       def find_descendants_of(klass, module_to_search)
         ObjectSpace.each_object(Class).select { |k| k < klass && find_descendants_of(k, module_to_search).count.zero? && k.name.deconstantize == module_to_search.name }
       end
 
-      def create_library(module_to_search)
-        library = Library.create(name: "Dedalus Pattern Library")
+      def create_library(module_to_search:, name:)
+        library = Library.create(name: name)
 
         atom_section = library.create_library_section(
           name: "Atoms",
@@ -54,14 +54,18 @@ module Dedalus
           name: "Templates",
           icon: :hive,
           color: 'blue',
-          about: "Assembled screens with placeholders"})
-
-        template_section.create_library_item({
-          name: "Library Template",
-          item_class_name: 'Dedalus::PatternLibrary::ApplicationTemplate',
-          description: "ui library app template",
-          example_data: ApplicationTemplate.example_data
+          about: "Assembled screens with placeholders"
         })
+
+        template_classes = find_descendants_of(Dedalus::Template, module_to_search)
+        template_section.build_items_from_classes(template_classes, kind: 'template')
+
+        # template_section.create_library_item({
+        #   name: "Library Template",
+        #   item_class_name: 'Dedalus::PatternLibrary::ApplicationTemplate',
+        #   description: "ui library app template",
+        #   example_data: ApplicationTemplate.example_data
+        # })
 
         # just manually create a view from models for now...
         library_data = serialize_library(library)

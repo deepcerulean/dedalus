@@ -3,7 +3,6 @@ module Dedalus
     class Text < Dedalus::Atom
       attr_accessor :text, :scale, :padding
 
-
       def render(*)
         x,y = *position
         font.draw(text, x + padding, y + padding, ZOrder::Text, self.scale, self.scale)

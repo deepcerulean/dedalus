@@ -34,6 +34,10 @@ module Dedalus
         }
       end
 
+      def self.description
+        "pattern library template"
+      end
+
       private
       def library_page
         if current_section

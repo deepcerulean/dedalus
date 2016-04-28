@@ -37,7 +37,7 @@ module Dedalus
       end
 
       def title_element
-        Elements::Heading.new(text: name, scale: 1.8 + scale)
+        LargeText.new(text: name)
       end
 
       def description_element

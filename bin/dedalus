@@ -8,6 +8,7 @@ if File.directory?(File.join(root,'.git'))
       require 'dedalus'
       Dedalus::PatternLibrary::Application.kickstart!({
         setup: {
+          library_name: "Dedalus Pattern Library",
           module_to_search: Dedalus::PatternLibrary
         }
       })

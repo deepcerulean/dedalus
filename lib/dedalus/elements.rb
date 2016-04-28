@@ -7,6 +7,14 @@ module Dedalus
     @active_view ||= nil
   end
 
+  class FontRepository
+    def self.get_font(size: 20)
+      @fonts ||= {}
+      @fonts[size] ||= Gosu::Font.new(size)
+      @fonts[size]
+    end
+  end
+
   class Element
     attr_accessor :position
 
@@ -41,7 +49,15 @@ module Dedalus
     end
 
     def font
-      view.font
+      FontRepository.get_font(size: 20)
+    end
+
+    def big_font
+      FontRepository.get_font(size: 36)
+    end
+
+    def huge_font
+      FontRepository.get_font(size: 120)
     end
 
     def window

@@ -8,7 +8,8 @@ module Dedalus
 
       def show
         [
-          Elements::Heading.new(text: abbreviation, scale: 6.0 * scale),
+          HugeText.new(text: abbreviation, scale: scale),
+          #Elements::Heading.new(text: abbreviation, scale: 6.0 * scale),
           Elements::Paragraph.new(text: element_name, scale: scale),
           Elements::Paragraph.new(text: kind, scale: 0.6 * scale)
         ]
@@ -35,15 +36,15 @@ module Dedalus
       end
 
       def padding
-        20 * scale
+        30 * scale
       end
 
       def width
-        230 * scale
+        280 * scale
       end
 
       def height
-        250 * scale
+        300 * scale
       end
 
       def background_color
