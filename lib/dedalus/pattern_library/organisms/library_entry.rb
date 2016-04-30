@@ -9,9 +9,9 @@ module Dedalus
 
       def show
         [
-          Elements::Heading.new(text: title),
-          Elements::Heading.new(text: subtitle, scale: 0.9),
-          Elements::Paragraph.new(text: description)
+          HugeText.new(text: title),
+          LargeText.new(text: subtitle),
+          TinyText.new(text: description)
         ] + [ library_items ]
       end
 

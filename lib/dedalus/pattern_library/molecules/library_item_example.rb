@@ -9,9 +9,10 @@ module Dedalus
 
       def show
         [
-          Elements::Paragraph.new(text: "EXAMPLE", scale: 0.5, height_percent: 0.05, background_color: background_color.darken),
+          TinyText.new(text: "EXAMPLE", height_percent: 0.05, background_color: background_color.darken),
           item,
-          Elements::Paragraph.new(text: item_data, scale: 0.7, background_color: Palette.decode_color('darkgray'), padding: 10)
+          TinyText.new(text: "DATA", height_percent: 0.05, background_color: background_color.darken),
+          Code.new(text: item_data, background_color: Palette.decode_color('darkgray'), padding: 10)
         ]
       end
 

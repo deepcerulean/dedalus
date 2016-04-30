@@ -5,6 +5,7 @@ module Dedalus
 
       def app_screen
         ApplicationScreen.new(app_template).hydrate(
+          mouse_position: mouse_position,
           library_section_tabs: library_view.library_section_tabs,
           current_entry_name: current_entry_name,
           library_sections: library_view.library_sections,

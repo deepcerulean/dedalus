@@ -1,19 +1,15 @@
 module Dedalus
   module Elements
-    class ImageRepository
-      def self.lookup(path)
-        @images ||= {}
-        @images[path] ||= Gosu::Image.new(path)
-        @images[path]
-      end
-    end
-
     class Image < Dedalus::Atom
-      attr_accessor :path, :padding
+      attr_accessor :path, :padding, :z_order
 
       def render
         x,y = *position
-        asset.draw(x + padding, y + padding, ZOrder::Foreground, scale, scale)
+        asset.draw(x + padding, y + padding, z_order, scale, scale)
+      end
+
+      def z_order
+        @z_order ||= ZOrder::Foreground
       end
 
       def width
@@ -29,7 +25,7 @@ module Dedalus
       end
 
       def padding
-        @padding ||= 10.0
+        @padding ||= 0.0
       end
 
       def scale
@@ -44,9 +40,8 @@ module Dedalus
         "an image"
       end
 
-      private
       def asset
-        @asset ||= ImageRepository.lookup(path)
+        @asset ||= Dedalus::ImageRepository.lookup(path)
       end
     end
   end

@@ -13,8 +13,8 @@ module Dedalus
       def layout
         [
           app_header,
-          [ sidebar, yield ]
-          # app_footer
+          [ sidebar, yield ],
+          app_footer
         ]
       end
 

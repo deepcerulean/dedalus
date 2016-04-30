@@ -8,10 +8,11 @@ module Dedalus
   end
 
   class FontRepository
-    def self.get_font(size: 20)
+    def self.get_font(font_name='Helvetica',size: 20)
       @fonts ||= {}
-      @fonts[size] ||= Gosu::Font.new(size)
-      @fonts[size]
+      @fonts[font_name] ||= {}
+      @fonts[font_name][size] ||= Gosu::Font.new(size, name: font_name)
+      @fonts[font_name][size]
     end
   end
 
@@ -31,21 +32,29 @@ module Dedalus
       attrs.each { |(k,v)| instance_variable_set(:"@#{k}",v) } unless attrs.nil?
     end
 
-    def draw_bounding_box(origin:, dimensions:, color: Palette.gray) #, highlight: false)
+    def draw_bounding_box(origin:, dimensions:, color: Palette.gray)
       x,y = *origin
       w,h = *dimensions
 
       raise "Invalid color #{color} given to #{self.class.name} for bounding box" unless color.is_a?(Dedalus::Color)
 
       c = color.to_gosu
-      window.draw_quad(x,y,c,
-                       x,y+h,c,
-                       x+w,y,c,
-                       x+w,y+h,c,ZOrder::Background)
+      window.draw_quad(x,   y,   c,
+                       x,   y+h, c,
+                       x+w, y,   c,
+                       x+w, y+h, c,ZOrder::Background)
     end
 
     def view
       Dedalus.active_view
+    end
+
+    def tiny_font
+      FontRepository.get_font(size: 14)
+    end
+
+    def code_font
+      FontRepository.get_font('courier new', size: 18)
     end
 
     def font
@@ -53,7 +62,7 @@ module Dedalus
     end
 
     def big_font
-      FontRepository.get_font(size: 36)
+      FontRepository.get_font(size: 24)
     end
 
     def huge_font
@@ -63,6 +72,54 @@ module Dedalus
     def window
       view.window
     end
+  end
+
+  ###
+
+  class Container < Element
+    def initialize(contents, attrs={})
+      @contents = contents
+      super(attrs)
+    end
+
+    def show
+      @contents
+    end
+  end
+
+  # layer is an abstract element...
+  # maybe should also pull out rows and columns?
+  # could cleanup traversal impl, and will be clearer ultimately
+  class Layer < Element
+    def initialize(elements, freeform: false)
+      @elements = elements
+      @freeform = freeform
+    end
+
+    def show
+      @elements
+    end
+
+    def freeform?
+      @freeform == true
+    end
+  end
+
+  # it's like a gluon or something, not sure how to model in nuclear terms
+  class LayerStack < Element
+    attr_reader :layers
+
+    def initialize(layers: [])
+      @layers = []
+    end
+
+    def push(layer_elements)
+      @layers.push(layer_elements)
+    end
+
+    # def each
+    #   @layers.each
+    # end
   end
 
   ###
@@ -87,6 +144,8 @@ module Dedalus
 
   class Screen < Element
   end
+
+  ###
 
   module ZOrder
     Background, Foreground, Text, Overlay = *(0..5)

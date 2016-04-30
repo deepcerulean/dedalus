@@ -2,7 +2,7 @@ module Dedalus
   class Color
     attr_accessor :red, :green, :blue, :alpha
 
-    def initialize(red,green,blue,alpha=255)
+    def initialize(red,green,blue,alpha=160)
       @red = red
       @green = green
       @blue = blue

@@ -19,14 +19,14 @@ module Dedalus
       @element_callback = blk
     end
 
-    def walk!(structure, origin:, dimensions:)
+    def walk!(structure, origin:, dimensions:, freeform: false)
       width, height = *dimensions
       height = structure.height if !structure.is_a?(Array) && structure.height
       width = structure.width if !structure.is_a?(Array) && structure.width
       x0, y0 = *origin
 
       if structure.is_a?(Dedalus::Atom)
-        @atom_callback.call(structure, origin: origin, dimensions: dimensions) if @atom_callback
+        @atom_callback.call(structure, origin: origin, dimensions: dimensions, freeform: freeform) if @atom_callback
       elsif structure.is_a?(Dedalus::Element)
         # an element *other than* an atom, we need to call #show on it
         margin = structure.margin || 0.0
@@ -42,13 +42,18 @@ module Dedalus
           @element_callback.call(structure, origin: margin_origin, dimensions: margin_dims)
         end
 
-        pad = structure.padding || 10.0
-        # x,y = x0+pad, y0+pad
+        pad = structure.padding || 0.0
         pad_origin = [x+pad,y+pad]
         pad_dims = [width - pad*2 - margin*2, height - pad*2 - margin*2 ]
 
-
-        walk!(structure.show, origin: pad_origin, dimensions: pad_dims)
+        if structure.is_a?(LayerStack)
+          layers = structure.layers
+          layers.each do |layer|
+            walk!(layer, origin: pad_origin, dimensions: pad_dims, freeform: layer.freeform?)
+          end
+        else
+          walk!(structure.show, origin: pad_origin, dimensions: pad_dims, freeform: freeform)
+        end
       elsif structure.is_a?(Array) # we have a set of rows
         walk_rows!(structure, origin: origin, dimensions: dimensions)
       end

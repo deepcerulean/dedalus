@@ -33,7 +33,7 @@ module Dedalus
 
     def render!(structure, dims)
       traverse(structure, origin: [0,0], dimensions: dims) do
-        on_atom do |atom, origin:, dimensions:|
+        on_atom do |atom, origin:, dimensions:, freeform:|
           if atom.background_color
             atom.draw_bounding_box(
               color: atom.background_color,
@@ -41,7 +41,8 @@ module Dedalus
               dimensions: dimensions
             )
           end
-          atom.position = origin
+
+          atom.position = origin unless freeform
           atom.render
         end
 

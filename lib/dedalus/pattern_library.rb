@@ -3,7 +3,10 @@ require 'dedalus/pattern_library/models/library_section'
 require 'dedalus/pattern_library/models/library_item'
 
 require 'dedalus/pattern_library/atoms/large_text'
+require 'dedalus/pattern_library/atoms/tiny_text'
 require 'dedalus/pattern_library/atoms/huge_text'
+require 'dedalus/pattern_library/atoms/code'
+
 require 'dedalus/pattern_library/molecules/library_section_tab'
 # require 'dedalus/pattern_library/molecules/library_item_molecule'
 require 'dedalus/pattern_library/molecules/library_item_example'

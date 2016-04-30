@@ -17,9 +17,8 @@ module Dedalus
     def compose(screen)
       screen = composer.hover_molecule(screen, dimensions, mouse_position: mouse_position)
       composer.render!(screen, dimensions)
-
-      cursor.position = mouse_position
-      cursor.render
+      # cursor.position = mouse_position
+      # cursor.render
     end
 
     def dimensions
@@ -33,11 +32,6 @@ module Dedalus
       else
         super
       end
-    end
-
-    protected
-    def cursor
-      @cursor ||= Elements::Icon.for :arrow_cursor
     end
 
     private

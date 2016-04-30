@@ -62,8 +62,8 @@ module Dedalus
 
       def self.example_data
         {
-          element_abbreviation: "Pa",
-          element_name: "Paragraph"
+          element_abbreviation: "Ht",
+          element_name: "Huge Text"
         }
       end
     end

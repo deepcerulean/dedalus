@@ -14,7 +14,7 @@ module Dedalus
       end
 
       def find_descendants_of(klass, module_to_search)
-        ObjectSpace.each_object(Class).select { |k| k < klass && find_descendants_of(k, module_to_search).count.zero? && k.name.deconstantize == module_to_search.name }
+        ObjectSpace.each_object(Class).select { |k| k < klass && k.name.deconstantize == module_to_search.name }
       end
 
       def create_library(module_to_search:, name:)

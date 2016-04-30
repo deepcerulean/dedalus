@@ -4,10 +4,7 @@ module Dedalus
       attr_accessor :icon, :name, :description, :scale, :highlight, :section_color
 
       def show
-        [[
-          icon_element, [ title_element,
-                          description_element ]
-        ]]
+        Container.new([[icon_element, [ title_element, description_element ]]], padding: 16)
       end
 
       def hover
@@ -33,7 +30,7 @@ module Dedalus
       end
 
       def icon_element
-        Elements::Icon.for(icon, padding: 16)
+        Elements::Icon.for(icon, padding: 10)
       end
 
       def title_element
