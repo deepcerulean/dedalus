@@ -5,6 +5,7 @@
 * [Email](mailto:jweissman1986 at gmail.com)
 
 [![Code Climate GPA](https://codeclimate.com/github/deepcerulean/dedalus/badges/gpa.svg)](https://codeclimate.com/github/deepcerulean/dedalus)
+[![Gem Version](https://badge.fury.io/rb/dedalus.svg)](https://badge.fury.io/rb/dedalus)
 
 ## Description
 
