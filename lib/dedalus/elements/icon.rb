@@ -11,6 +11,10 @@ module Dedalus
         @path ||= "media/icons/#{name}.png"
       end
 
+      def self.example_data
+        { name: 'house' }
+      end
+
       class << self
         def for(sym, attrs={})
           new(attrs.merge(name: sym))

@@ -33,7 +33,7 @@ module Dedalus
       end
 
       def self.example_data
-        { path: "media/icons/house.png" }
+        { path: "media/images/cosmos.jpg", scale: 0.2 }
       end
 
       def self.description

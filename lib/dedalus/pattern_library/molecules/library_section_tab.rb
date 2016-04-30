@@ -8,7 +8,6 @@ module Dedalus
       end
 
       def hover
-        p [ :hovering_on, section: name ]
         @scale = 0.2
       end
 

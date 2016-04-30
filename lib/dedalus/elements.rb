@@ -26,7 +26,7 @@ module Dedalus
     attr_accessor :width, :height
 
     attr_accessor :padding, :margin
-    attr_accessor :background_color
+    attr_accessor :color, :background_color
 
     def initialize(attrs={})
       attrs.each { |(k,v)| instance_variable_set(:"@#{k}",v) } unless attrs.nil?
@@ -54,7 +54,7 @@ module Dedalus
     end
 
     def code_font
-      FontRepository.get_font('courier new', size: 18)
+      FontRepository.get_font('courier new', size: 20)
     end
 
     def font
@@ -71,6 +71,14 @@ module Dedalus
 
     def window
       view.window
+    end
+
+    def background_color
+      @background_color ||= if color
+                      Palette.decode_color(color)
+                    else
+                      nil
+                    end
     end
   end
 

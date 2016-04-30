@@ -8,10 +8,26 @@ module Dedalus
       attr_accessor :color
 
       def show
+        [[
+          periodic_table_entry,
+          example
+        ]]
+      end
+
+      def periodic_table_entry
+        PeriodicTableEntry.new(
+          element_name: name,
+          color: color,
+          kind: kind,
+          scale: 1.8
+        )
+      end
+
+      def example
         [
-          TinyText.new(text: "EXAMPLE", height_percent: 0.05, background_color: background_color.darken),
+          LargeText.new(text: "EXAMPLE", height_percent: 0.05, color: color),
           item,
-          TinyText.new(text: "DATA", height_percent: 0.05, background_color: background_color.darken),
+          LargeText.new(text: "DATA", height_percent: 0.05, color: color),
           Code.new(text: item_data, background_color: Palette.decode_color('darkgray'), padding: 10)
         ]
       end
@@ -25,11 +41,7 @@ module Dedalus
       end
 
       def background_color
-        if color
-          Palette.decode_color(color).darken
-        else
-          Palette.gray
-        end
+        nil
       end
 
       def self.description
