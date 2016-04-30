@@ -34,11 +34,11 @@ module Dedalus
       end
 
       def title_element
-        LargeText.new(text: name)
+        Elements::Heading.new(text: name)
       end
 
       def description_element
-        Elements::Paragraph.new(text: description)
+        TinyText.new(text: description)
       end
 
       def self.description

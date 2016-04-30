@@ -9,9 +9,8 @@ module Dedalus
       def show
         [
           HugeText.new(text: abbreviation, scale: scale),
-          #Elements::Heading.new(text: abbreviation, scale: 6.0 * scale),
-          Elements::Paragraph.new(text: element_name, scale: scale),
-          Elements::Paragraph.new(text: kind, scale: 0.6 * scale)
+          LargeText.new(text: element_name, scale: scale),
+          TinyText.new(text: kind, scale: scale)
         ]
       end
 
@@ -40,7 +39,7 @@ module Dedalus
       end
 
       def width
-        280 * scale
+        260 * scale
       end
 
       def height

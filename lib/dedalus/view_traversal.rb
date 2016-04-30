@@ -68,7 +68,16 @@ module Dedalus
         y = y0 + height_cursor
         dims = [width, current_row_height]
         if row.is_a?(Array)
-          walk_columns!(row, origin: [x0, y], dimensions: dims)
+          extra_columns = true
+          while extra_columns 
+            row = walk_columns!(row, origin: [x0, y], dimensions: dims)
+            if row.empty?
+              extra_columns = false
+            else
+              height_cursor += row.first.height
+              y = y0 + height_cursor
+            end
+          end
         else
           walk!(row, origin: [x0,y], dimensions: dims)
         end
@@ -78,6 +87,7 @@ module Dedalus
     def walk_columns!(columns, origin:, dimensions:)
       width, height = *dimensions
       x0, y0 = *origin
+
       subdivide_line(columns, distance: width, attr: :width) do |column, current_column_width, width_cursor|
         x = x0 + width_cursor
         dims = [ current_column_width, height ]
@@ -126,9 +136,16 @@ module Dedalus
           end
         end
 
+        if distance_cursor > distance - current_element_distance # ??
+          return elements.slice(index,elements.size)
+        end
+
         yield(element, current_element_distance, distance_cursor)
         distance_cursor += current_element_distance
       end
+
+      # no overflowing elements...
+      []
     end
   end
 end
