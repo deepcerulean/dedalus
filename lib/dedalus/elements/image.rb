@@ -1,11 +1,13 @@
 module Dedalus
   module Elements
     class Image < Dedalus::Atom
-      attr_accessor :path, :padding, :z_order
+      attr_accessor :path, :padding, :z_order, :invert_x, :invert_y
 
       def render
         x,y = *position
-        asset.draw(x + padding, y + padding, z_order, scale, scale)
+        x_scale = invert_x ? -scale : scale
+        y_scale = invert_y ? -scale : scale
+        asset.draw(x + padding, y + padding, z_order, x_scale, y_scale)
       end
 
       def z_order

@@ -42,7 +42,15 @@ module Dedalus
             )
           end
 
-          atom.position = origin unless freeform
+          if freeform # then offset by origin
+            x0,y0 = *origin
+            x,y = *atom.position
+            atom.position = [x+x0,y+y0]
+          else
+            atom.position = origin
+          end
+
+          # atom.position = origin unless freeform
           atom.render
         end
 

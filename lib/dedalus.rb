@@ -19,5 +19,6 @@ require 'dedalus/elements/image'
 require 'dedalus/elements/icon'
 require 'dedalus/elements/sprite'
 require 'dedalus/elements/image_grid'
+require 'dedalus/elements/sprite_field'
 
 require 'dedalus/pattern_library'

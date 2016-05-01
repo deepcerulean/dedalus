@@ -10,7 +10,7 @@ module Dedalus
       def self.example_data
         {
           path: "media/images/tiles.png",
-          frame: 0,
+          frame: 3,
           width: 64,
           height: 64
         }
