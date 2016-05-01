@@ -54,6 +54,7 @@ module Dedalus
               dimensions: dimensions
             )
           end
+          element.position = origin # ...
         end
       end
     end

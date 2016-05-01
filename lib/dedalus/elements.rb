@@ -124,10 +124,6 @@ module Dedalus
     def push(layer_elements)
       @layers.push(layer_elements)
     end
-
-    # def each
-    #   @layers.each
-    # end
   end
 
   ###
