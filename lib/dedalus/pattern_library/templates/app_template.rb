@@ -61,7 +61,7 @@ module Dedalus
         ApplicationHeader.new(
           title: library_name,
           subtitle: 'A Visual Pattern Library for Joyce',
-          height_percent: 0.15,
+          height_percent: 0.16,
           background_color: Palette.blue
         )
       end

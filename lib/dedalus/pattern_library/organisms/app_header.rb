@@ -11,7 +11,7 @@ module Dedalus
       end
 
       def padding
-        20
+        16
       end
 
       def self.description
