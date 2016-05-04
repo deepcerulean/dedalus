@@ -13,16 +13,26 @@ module Dedalus
         layer_stack.push(Dedalus::Layer.new(background_image))
         layer_stack.push(Dedalus::Layer.new(image_grid))
 
+        # p [ canvas_layer: canvas_layer ] 
+        layer_stack.push(canvas_layer)
+        layer_stack
+      end
+
+      def canvas_layer
         # TODO one sprite *layer*
-        sprite_map.each do |location, sprite_list|
-          sprite_list.each do |sprite_attrs|
+        Dedalus::Layer.new(sprites, freeform: true)
+      end
+
+      def sprites
+        sprite_map.flat_map do |location, sprite_list|
+          sprite_list.map do |sprite|
             position = to_screen_coordinates(location: location)
-            sprite = Sprite.new(sprite_attrs.merge(position: position))
-            layer_stack.push(Dedalus::Layer.new(sprite, freeform: true))
+            sprite.position = position
+            p [ updated_sprite_position: sprite ]
+            sprite
+            # Sprite.new(sprite_attrs.merge(position: position))
           end
         end
-
-        layer_stack
       end
 
       def image_grid
@@ -55,7 +65,7 @@ module Dedalus
                  [1,1,1,1,1]],
           scale: 0.3,
           player_location: [2,2],
-          sprite_map: { [0,0] => [ Sprite.example_data ] }
+          sprite_map: { [1.2,2.4] => [ Sprite.new(Sprite.example_data) ] }
         }
       end
     end

@@ -49,7 +49,19 @@ module Dedalus
         if structure.is_a?(LayerStack)
           layers = structure.layers
           layers.each do |layer|
-            walk!(layer, origin: pad_origin, dimensions: pad_dims, freeform: layer.freeform?)
+            # TODO cleanup a bit?
+            if layer.freeform?
+              if layer.show.is_a?(Array)
+                # need to run through each element individually?
+                layer.show.each do |layer_element|
+                  walk!(layer_element, origin: pad_origin, dimensions: pad_dims, freeform: true)
+                end
+              else
+                walk!(layer, origin: pad_origin, dimensions: pad_dims, freeform: true)
+              end
+            else
+              walk!(layer, origin: pad_origin, dimensions: pad_dims, freeform: false)
+            end
           end
         else
           walk!(structure.show, origin: pad_origin, dimensions: pad_dims, freeform: freeform)
@@ -69,7 +81,7 @@ module Dedalus
         dims = [width, current_row_height]
         if row.is_a?(Array)
           extra_columns = true
-          while extra_columns 
+          while extra_columns
             row = walk_columns!(row, origin: [x0, y], dimensions: dims)
             if row.empty?
               extra_columns = false

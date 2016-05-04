@@ -4,19 +4,27 @@ module Dedalus
       attr_accessor :grid, :tiles_path, :tile_width, :tile_height
 
       def show
-        grid.map do |row|
-          row.map do |grid_value|
-            if grid_value
-              sprite_for(grid_value)
-            else
-              no_image
+        if grid
+          grid.map do |row|
+            row.map do |grid_value|
+              if grid_value
+                sprite_for(grid_value)
+              else
+                no_image
+              end
             end
           end
+        else
+          []
         end
       end
 
       def height
-        grid.length * tile_height
+        if grid
+          grid.length * tile_height
+        else
+          0
+        end
       end
 
       def sprite_for(frame)

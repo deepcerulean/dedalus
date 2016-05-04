@@ -1,7 +1,7 @@
 module Dedalus
   module Elements
     class Image < Dedalus::Atom
-      attr_accessor :path, :padding, :z_order, :invert_x, :invert_y
+      attr_accessor :path, :padding, :z_order, :invert_x, :invert_y, :overlay_color
 
       def render
         x,y = *position
@@ -10,7 +10,17 @@ module Dedalus
 
         ox,oy = *offset
 
-        asset.draw(x + padding + ox, y + padding + oy, z_order, x_scale, y_scale)
+        if overlay_color
+          asset.draw(x + padding + ox, y + padding + oy, z_order, x_scale, y_scale, overlay_gosu_color)
+        else
+          asset.draw(x + padding + ox, y + padding + oy, z_order, x_scale, y_scale) #, overlay_color)
+        end
+      end
+
+      def overlay_gosu_color
+        clr = Palette.decode_color(overlay_color).to_gosu
+        clr.alpha = 255
+        clr
       end
 
       def offset
