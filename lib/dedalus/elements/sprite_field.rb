@@ -1,7 +1,6 @@
 module Dedalus
   module Elements
     class SpriteField < Dedalus::Organism
-
       attr_accessor :grid, :sprite_map, :scale
 
       def show
@@ -13,13 +12,11 @@ module Dedalus
         layer_stack.push(Dedalus::Layer.new(background_image))
         layer_stack.push(Dedalus::Layer.new(image_grid))
 
-        # p [ canvas_layer: canvas_layer ] 
         layer_stack.push(canvas_layer)
         layer_stack
       end
 
       def canvas_layer
-        # TODO one sprite *layer*
         Dedalus::Layer.new(sprites, freeform: true)
       end
 
@@ -28,9 +25,7 @@ module Dedalus
           sprite_list.map do |sprite|
             position = to_screen_coordinates(location: location)
             sprite.position = position
-            p [ updated_sprite_position: sprite ]
             sprite
-            # Sprite.new(sprite_attrs.merge(position: position))
           end
         end
       end
