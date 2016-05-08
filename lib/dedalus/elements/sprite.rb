@@ -12,7 +12,9 @@ module Dedalus
           path: "media/images/tiles.png",
           frame: 3,
           width: 64,
-          height: 64
+          height: 64,
+          invert_x: true,
+          scale: 2.5
         }
       end
 

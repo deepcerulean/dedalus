@@ -11,9 +11,9 @@ module Dedalus
         ox,oy = *offset
 
         if overlay_color
-          asset.draw(x + padding + ox, y + padding + oy, z_order, x_scale, y_scale, overlay_gosu_color)
+          asset.draw(x + padding + ox*scale, y + padding + oy*scale, z_order, x_scale, y_scale, overlay_gosu_color)
         else
-          asset.draw(x + padding + ox, y + padding + oy, z_order, x_scale, y_scale) #, overlay_color)
+          asset.draw(x + padding + ox*scale, y + padding + oy*scale, z_order, x_scale, y_scale) #, overlay_color)
         end
       end
 
