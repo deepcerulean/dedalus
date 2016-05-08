@@ -1,5 +1,6 @@
 module Dedalus
   module Elements
+    # TODO image grid should learn to use window#record http://www.rubydoc.info/github/jlnr/gosu/Gosu%2FWindow%3Arecord
     class ImageGrid < Dedalus::Molecule
       attr_accessor :grid, :tiles_path, :tile_width, :tile_height
 
@@ -53,6 +54,5 @@ module Dedalus
         }
       end
     end
-
   end
 end

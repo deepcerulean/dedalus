@@ -1,7 +1,7 @@
 module Dedalus
   module Elements
     class SpriteField < Dedalus::Organism
-      attr_accessor :grid, :sprite_map, :scale
+      attr_accessor :grid, :sprite_map, :scale, :camera_location
 
       def show
         layers
@@ -31,17 +31,20 @@ module Dedalus
       end
 
       def image_grid
+        cx,cy = *camera_location
         ImageGrid.new(
           tiles_path: 'media/images/tiles.png',
           grid: grid,
           tile_width: 64,
-          tile_height: 64
+          tile_height: 64,
+          offset: [-cx*64, -cy*64]
         )
       end
 
       def to_screen_coordinates(location:)
         x,y = *location
-        [(x * image_grid.tile_width), (y * image_grid.tile_height)]
+        cx,cy = *camera_location
+        [(x * image_grid.tile_width - cx*64), (y * image_grid.tile_height - cy*64)]
       end
 
       def background_image
@@ -59,7 +62,7 @@ module Dedalus
                  [1,1,1,1,1],
                  [1,1,1,1,1]],
           scale: 0.3,
-          player_location: [2,2],
+          camera_location: [1.2,2.4],
           sprite_map: { [1.2,2.4] => [ Sprite.new(Sprite.example_data) ] }
         }
       end

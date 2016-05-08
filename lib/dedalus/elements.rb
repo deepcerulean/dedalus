@@ -17,7 +17,7 @@ module Dedalus
   end
 
   class Element
-    attr_accessor :position
+    attr_accessor :position, :offset
 
     # in % as 0.0-1.0 (hint to compositing engine for elements in columns/rows respectively)
     attr_accessor :width_percent, :height_percent

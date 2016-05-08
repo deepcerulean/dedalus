@@ -28,9 +28,13 @@ module Dedalus
       if structure.is_a?(Dedalus::Atom)
         @atom_callback.call(structure, origin: origin, dimensions: dimensions, freeform: freeform) if @atom_callback
       elsif structure.is_a?(Dedalus::Element)
+        offset = structure.offset || [0,0]
+        ox,oy = *offset
+
         # an element *other than* an atom, we need to call #show on it
         margin = structure.margin || 0.0
-        x,y = x0 + margin, y0 + margin
+        x,y = x0 + ox + margin, y0 + oy + margin
+
         margin_origin = [ x, y ]
         margin_dims = [ width - margin*2, height - margin*2 ]
 
