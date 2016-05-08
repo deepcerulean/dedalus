@@ -24,13 +24,9 @@ module Dedalus
       end
 
       def offset
-        if invert_x
-          [ width, 0 ]
-        elsif invert_y
-          [ 0, height ]
-        else
-          [ 0, 0 ]
-        end
+        ox = invert_x ? width : 0
+        oy = invert_y ? height : 0
+        [ ox, oy ]
       end
 
       def z_order
@@ -58,7 +54,7 @@ module Dedalus
       end
 
       def self.example_data
-        { path: "media/images/cosmos.jpg", scale: 0.2, invert_y: true }
+        { path: "media/images/cosmos.jpg", scale: 0.2, invert_y: true, invert_x: true }
       end
 
       def self.description
