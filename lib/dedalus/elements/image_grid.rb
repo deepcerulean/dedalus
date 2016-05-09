@@ -10,7 +10,7 @@ module Dedalus
       end
 
       def record?
-        true
+        !grid.empty?
       end
 
       def width

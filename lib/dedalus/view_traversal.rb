@@ -20,6 +20,7 @@ module Dedalus
     end
 
     def walk!(structure, origin:, dimensions:, freeform: false, render: false)
+      # p [ :walk, render: render ]
       width, height = *dimensions
       height = structure.height if !structure.is_a?(Array) && structure.height
       width = structure.width if !structure.is_a?(Array) && structure.width
@@ -58,39 +59,39 @@ module Dedalus
               if layer.show.is_a?(Array)
                 # need to run through each element individually?
                 layer.show.each do |layer_element|
-                  walk!(layer_element, origin: pad_origin, dimensions: pad_dims, freeform: true)
+                  walk!(layer_element, origin: pad_origin, dimensions: pad_dims, freeform: true, render: render)
                 end
               else
-                walk!(layer, origin: pad_origin, dimensions: pad_dims, freeform: true)
+                walk!(layer, origin: pad_origin, dimensions: pad_dims, freeform: true, render: render)
               end
             else
-              walk!(layer, origin: pad_origin, dimensions: pad_dims, freeform: false)
+              walk!(layer, origin: pad_origin, dimensions: pad_dims, freeform: false, render: render)
             end
           end
         else
+          # p [ :checking_for_recording, record: structure.record?, render: render ]
           if structure.record? && render
+            # p [ :structure_indicates_recording! ]
             recorded_image = ImageRepository.lookup_recording(structure.name, structure.width, structure.height, structure.window) do
               p [ :recording! ]
-              walk!(structure.show, origin: pad_origin, dimensions: pad_dims, freeform: freeform)
+              walk!(structure.show, origin: [0,0], dimensions: pad_dims, freeform: freeform, render: render)
             end
 
-            # if recorded_image
-              ox,oy = *pad_origin
-              p [ :drawing_recorded_image, at: [ox,oy] ]
-              recorded_image.draw(ox,oy)
-            # end
+            ox,oy = *pad_origin
+            # p [ :drawing_recorded_image, at: [ox,oy] ]
+            recorded_image.draw(ox,oy,10) #ox,oy,10)
           else
-            walk!(structure.show, origin: pad_origin, dimensions: pad_dims, freeform: freeform)
+            walk!(structure.show, origin: pad_origin, dimensions: pad_dims, freeform: freeform, render: render)
           end
         end
 
       elsif structure.is_a?(Array) # we have a set of rows
-        walk_rows!(structure, origin: origin, dimensions: dimensions)
+        walk_rows!(structure, origin: origin, dimensions: dimensions, render: render)
       end
     end
 
     private
-    def walk_rows!(rows, origin:, dimensions:)
+    def walk_rows!(rows, origin:, dimensions:, render: false)
       width, height = *dimensions
       x0, y0 = *origin
 
@@ -100,7 +101,7 @@ module Dedalus
         if row.is_a?(Array)
           extra_columns = true
           while extra_columns
-            row = walk_columns!(row, origin: [x0, y], dimensions: dims)
+            row = walk_columns!(row, origin: [x0, y], dimensions: dims, render: render)
             if row.empty?
               extra_columns = false
             else
@@ -109,19 +110,19 @@ module Dedalus
             end
           end
         else
-          walk!(row, origin: [x0,y], dimensions: dims)
+          walk!(row, origin: [x0,y], dimensions: dims, render: render)
         end
       end
     end
 
-    def walk_columns!(columns, origin:, dimensions:)
+    def walk_columns!(columns, origin:, dimensions:, render: false)
       width, height = *dimensions
       x0, y0 = *origin
 
       subdivide_line(columns, distance: width, attr: :width) do |column, current_column_width, width_cursor|
         x = x0 + width_cursor
         dims = [ current_column_width, height ]
-        walk!(column, origin: [x,y0], dimensions: dims)
+        walk!(column, origin: [x,y0], dimensions: dims, render: render)
       end
     end
 
