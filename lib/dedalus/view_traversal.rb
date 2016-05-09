@@ -19,7 +19,7 @@ module Dedalus
       @element_callback = blk
     end
 
-    def walk!(structure, origin:, dimensions:, freeform: false)
+    def walk!(structure, origin:, dimensions:, freeform: false, render: false)
       width, height = *dimensions
       height = structure.height if !structure.is_a?(Array) && structure.height
       width = structure.width if !structure.is_a?(Array) && structure.width
@@ -68,8 +68,22 @@ module Dedalus
             end
           end
         else
-          walk!(structure.show, origin: pad_origin, dimensions: pad_dims, freeform: freeform)
+          if structure.record? && render
+            recorded_image = ImageRepository.lookup_recording(structure.name, structure.width, structure.height, structure.window) do
+              p [ :recording! ]
+              walk!(structure.show, origin: pad_origin, dimensions: pad_dims, freeform: freeform)
+            end
+
+            # if recorded_image
+              ox,oy = *pad_origin
+              p [ :drawing_recorded_image, at: [ox,oy] ]
+              recorded_image.draw(ox,oy)
+            # end
+          else
+            walk!(structure.show, origin: pad_origin, dimensions: pad_dims, freeform: freeform)
+          end
         end
+
       elsif structure.is_a?(Array) # we have a set of rows
         walk_rows!(structure, origin: origin, dimensions: dimensions)
       end

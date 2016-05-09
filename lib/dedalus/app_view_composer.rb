@@ -3,13 +3,13 @@ module Dedalus
     include Geometer::PointHelpers
     include Geometer::DimensionHelpers
 
-    def traverse(structure, origin: [0,0], dimensions:, &blk)
+    def traverse(structure, origin: [0,0], dimensions:, render: false, &blk)
       traversal = ViewTraversal.new(&blk)
-      traversal.walk!(structure, origin: origin, dimensions: dimensions)
+      traversal.walk!(structure, origin: origin, dimensions: dimensions, render: render)
       structure
     end
 
-    def send_molecule(structure, window_dims, mouse_position:, message:) #, origin: [0,0], dimensions:, mouse_position:)
+    def send_molecule(structure, window_dims, mouse_position:, message:)
       mouse_coord = coord(*mouse_position)
 
       traverse(structure, origin: [0,0], dimensions: window_dims) do
@@ -32,7 +32,7 @@ module Dedalus
     end
 
     def render!(structure, dims)
-      traverse(structure, origin: [0,0], dimensions: dims) do
+      traverse(structure, origin: [0,0], dimensions: dims, render: true) do
         on_atom do |atom, origin:, dimensions:, freeform:|
           if atom.background_color
             atom.draw_bounding_box(
@@ -50,7 +50,6 @@ module Dedalus
             atom.position = origin
           end
 
-          # atom.position = origin unless freeform
           atom.render
         end
 
@@ -62,7 +61,8 @@ module Dedalus
               dimensions: dimensions
             )
           end
-          element.position = origin # ...
+
+          element.position = origin
         end
       end
     end

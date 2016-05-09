@@ -3,7 +3,7 @@ module Dedalus
     class SpriteField < Dedalus::Organism
       attr_accessor :grid, :sprite_map, :scale, :camera_location
       # TODO tiles path and width/height as attrs
-
+      
       def show
         layers
       end
@@ -41,13 +41,12 @@ module Dedalus
       end
 
       def image_grid
-        # cx,cy = *camera_offset
         ImageGrid.new(
           tiles_path: 'media/images/tiles.png',
           grid: grid,
           tile_width: 64,
           tile_height: 64,
-          offset: camera_offset #[-cx*64, -cy*64]
+          offset: camera_offset
         )
       end
 
@@ -67,9 +66,9 @@ module Dedalus
 
       def self.example_data
         {
-          grid: [[0,0,0,0,0],
+          grid: [[0,2,0,0,0],
                  [0,0,0,0,0],
-                 [1,1,1,1,1],
+                 [1,1,3,1,1],
                  [1,1,1,1,1]],
           scale: 0.3,
           camera_location: [1.2,2.4],

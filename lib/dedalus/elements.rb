@@ -32,6 +32,10 @@ module Dedalus
       attrs.each { |(k,v)| instance_variable_set(:"@#{k}",v) } unless attrs.nil?
     end
 
+    def record?
+      false
+    end
+
     def draw_bounding_box(origin:, dimensions:, color: Palette.gray)
       x,y = *origin
       w,h = *dimensions

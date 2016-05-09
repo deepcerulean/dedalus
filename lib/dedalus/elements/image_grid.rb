@@ -3,6 +3,31 @@ module Dedalus
     # TODO image grid should learn to use window#record http://www.rubydoc.info/github/jlnr/gosu/Gosu%2FWindow%3Arecord
     class ImageGrid < Dedalus::Molecule
       attr_accessor :grid, :tiles_path, :tile_width, :tile_height
+      attr_accessor :recorded_image
+
+      def name
+        'an-image-grid' # we record these, so... we need a unique identifier that will persist across invocations -- in general we'll only be using one, but if they're layered you may need to differentiate...
+      end
+
+      def record?
+        true
+      end
+
+      def width
+        if grid && grid.first
+          grid.first.length * tile_width
+        else
+          0
+        end
+      end
+
+      def height
+        if grid
+          grid.length * tile_height
+        else
+          0
+        end
+      end
 
       def show
         if grid
