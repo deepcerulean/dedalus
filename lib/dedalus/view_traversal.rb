@@ -20,14 +20,20 @@ module Dedalus
     end
 
     def walk!(structure, origin:, dimensions:, freeform: false, render: false)
-      # p [ :walk, render: render ]
       width, height = *dimensions
+
       height = structure.height if !structure.is_a?(Array) && structure.height
-      width = structure.width if !structure.is_a?(Array) && structure.width
+      width  = structure.width  if !structure.is_a?(Array) && structure.width
+
       x0, y0 = *origin
 
       if structure.is_a?(Dedalus::Atom)
         @atom_callback.call(structure, origin: origin, dimensions: dimensions, freeform: freeform) if @atom_callback
+
+      # implicitly array is rows, nested arrays are columns, doubly-nested arrays are rows, etc
+      elsif structure.is_a?(Array)
+        walk_rows!(structure, origin: origin, dimensions: dimensions, render: render)
+
       elsif structure.is_a?(Dedalus::Element)
         offset = structure.offset || [0,0]
         ox,oy = *offset
@@ -54,10 +60,8 @@ module Dedalus
         if structure.is_a?(LayerStack)
           layers = structure.layers
           layers.each do |layer|
-            # TODO cleanup a bit?
             if layer.freeform?
               if layer.show.is_a?(Array)
-                # need to run through each element individually?
                 layer.show.each do |layer_element|
                   walk!(layer_element, origin: pad_origin, dimensions: pad_dims, freeform: true, render: render)
                 end
@@ -69,24 +73,18 @@ module Dedalus
             end
           end
         else
-          # p [ :checking_for_recording, record: structure.record?, render: render ]
           if structure.record? && render
-            # p [ :structure_indicates_recording! ]
             recorded_image = ImageRepository.lookup_recording(structure.name, structure.width, structure.height, structure.window) do
-              p [ :recording! ]
               walk!(structure.show, origin: [0,0], dimensions: pad_dims, freeform: freeform, render: render)
             end
 
             ox,oy = *pad_origin
-            # p [ :drawing_recorded_image, at: [ox,oy] ]
-            recorded_image.draw(ox,oy,10) #ox,oy,10)
+            recorded_image.draw(ox,oy,10)
           else
             walk!(structure.show, origin: pad_origin, dimensions: pad_dims, freeform: freeform, render: render)
           end
         end
 
-      elsif structure.is_a?(Array) # we have a set of rows
-        walk_rows!(structure, origin: origin, dimensions: dimensions, render: render)
       end
     end
 
@@ -167,7 +165,7 @@ module Dedalus
           end
         end
 
-        if distance_cursor > distance - current_element_distance # ??
+        if distance_cursor > distance - current_element_distance
           return elements.slice(index,elements.size)
         end
 
@@ -175,7 +173,6 @@ module Dedalus
         distance_cursor += current_element_distance
       end
 
-      # no overflowing elements...
       []
     end
   end

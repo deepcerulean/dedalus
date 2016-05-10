@@ -4,16 +4,18 @@ module Dedalus
       attr_accessor :path, :padding, :z_order, :invert_x, :invert_y, :overlay_color
 
       def render
-        x,y = *position
+        x0,y0 = *position
+        ox,oy = *offset
+
         x_scale = invert_x ? -scale : scale
         y_scale = invert_y ? -scale : scale
 
-        ox,oy = *offset
+        x,y = x0 + padding + ox*scale, y0 + padding + oy*scale
 
         if overlay_color
-          asset.draw(x + padding + ox*scale, y + padding + oy*scale, z_order, x_scale, y_scale, overlay_gosu_color)
+          asset.draw(x,y, z_order, x_scale, y_scale, overlay_gosu_color)
         else
-          asset.draw(x + padding + ox*scale, y + padding + oy*scale, z_order, x_scale, y_scale) #, overlay_color)
+          asset.draw(x,y, z_order, x_scale, y_scale)
         end
       end
 

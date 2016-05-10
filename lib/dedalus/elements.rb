@@ -117,7 +117,6 @@ module Dedalus
     end
   end
 
-  # it's like a gluon or something, not sure how to model in nuclear terms
   class LayerStack < Element
     attr_reader :layers
 

@@ -8,14 +8,14 @@ module Dedalus
 
     def self.lookup_tiles(path, width, height)
       @tiles ||= {}
-      @tiles[path] ||= Gosu::Image::load_tiles(path, width, height)
+      @tiles[path] ||= Gosu::Image::load_tiles(path, width.to_i, height.to_i)
       @tiles[path]
     end
 
     def self.lookup_recording(id,width,height,window,&blk)
-      p [ :lookup_recording, id: id ]
+      # p [ :lookup_recording, id: id ]
       @recordings ||= {}
-      @recordings[id] ||= window.record(width,height,&blk)
+      @recordings[id] ||= window.record(width.to_i,height.to_i,&blk)
       @recordings[id]
     end
   end

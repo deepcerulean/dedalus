@@ -2,8 +2,9 @@ module Dedalus
   module Elements
     class SpriteField < Dedalus::Organism
       attr_accessor :grid, :sprite_map, :scale, :camera_location
+      attr_accessor :tile_width, :tile_height, :tiles_path
       # TODO tiles path and width/height as attrs
-      
+
       def show
         layers
       end
@@ -21,7 +22,6 @@ module Dedalus
         layer_stack = Dedalus::LayerStack.new
         layer_stack.push(Dedalus::Layer.new(background_image))
         layer_stack.push(Dedalus::Layer.new(image_grid))
-
         layer_stack.push(canvas_layer)
         layer_stack
       end
@@ -42,18 +42,20 @@ module Dedalus
 
       def image_grid
         ImageGrid.new(
-          tiles_path: 'media/images/tiles.png',
+          tiles_path: tiles_path, #'media/images/tiles.png',
           grid: grid,
-          tile_width: 64,
-          tile_height: 64,
-          offset: camera_offset
+          tile_width: tile_width,
+          tile_height: tile_height,
+          scale: scale,
+          offset: camera_offset,
+          name: 'sprite-field-tiles'
         )
       end
 
       def to_screen_coordinates(location:)
         x,y = *location
         cx,cy = *camera_offset
-        [(x * image_grid.tile_width + cx), (y * image_grid.tile_height + cy)]
+        [(x * tile_width + cx), (y * tile_height + cy)]
       end
 
       def background_image
@@ -70,9 +72,14 @@ module Dedalus
                  [0,0,0,0,0],
                  [1,1,3,1,1],
                  [1,1,1,1,1]],
-          scale: 0.3,
+          scale: 2.0,
           camera_location: [1.2,2.4],
-          sprite_map: { [1.2,2.4] => [ Sprite.new(Sprite.example_data) ] }
+          tiles_path: "media/images/tiles.png",
+          tile_width: 64,
+          tile_height: 64,
+          sprite_map: {
+            [1.2,2.4] => [ Sprite.new(Sprite.example_data) ]
+          }
         }
       end
     end
