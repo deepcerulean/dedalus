@@ -15,14 +15,8 @@ module Dedalus
     end
 
     def compose(screen)
-      p [ :compose ]
-      screen = composer.hover_molecule(screen, dimensions, mouse_position: mouse_position)
-      # p [ screen: screen ]
-      # require 'pry'
-      # binding.pry
+      composer.hover_molecule(screen, dimensions, mouse_position: mouse_position)
       composer.render!(screen.shown, dimensions)
-      # cursor.position = mouse_position
-      # cursor.render
     end
 
     def dimensions

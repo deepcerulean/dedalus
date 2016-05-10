@@ -12,8 +12,8 @@ module Dedalus
       end
 
       def hover
-        p [ :hover_section_tab, name: name ]
-        self.scale = 1.2
+        # self.section_color.darken
+        self.scale = 1.05
       end
 
       def background_color
