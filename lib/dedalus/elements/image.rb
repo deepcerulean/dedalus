@@ -10,7 +10,7 @@ module Dedalus
         x_scale = invert_x ? -scale : scale
         y_scale = invert_y ? -scale : scale
 
-        x,y = x0 + padding + ox*scale, y0 + padding + oy*scale
+        x,y = x0 + padding + ox, y0 + padding + oy
 
         if overlay_color
           asset.draw(x,y, z_order, x_scale, y_scale, overlay_gosu_color)
