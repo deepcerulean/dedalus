@@ -17,6 +17,7 @@ module Dedalus
           element_bounding_box = Geometer::Rectangle.new(coord(*origin), dim(*dimensions))
           mouse_overlap = element_bounding_box.contains?(mouse_coord) rescue false # could get bad coords...
           if mouse_overlap
+            molecule.position = origin
             molecule.send(message)
           end
 

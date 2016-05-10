@@ -12,7 +12,6 @@ module Dedalus
       end
 
       def hover
-        # self.section_color.darken
         self.scale = 1.05
       end
 

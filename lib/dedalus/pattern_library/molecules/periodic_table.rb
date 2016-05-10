@@ -10,7 +10,7 @@ module Dedalus
               element_name: name,
               color: color,
               kind: kind,
-              scale: 0.5
+              scale: 0.35
             )
           end
         end

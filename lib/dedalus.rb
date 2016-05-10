@@ -21,5 +21,6 @@ require 'dedalus/elements/icon'
 require 'dedalus/elements/sprite'
 require 'dedalus/elements/image_grid'
 require 'dedalus/elements/sprite_field'
+require 'dedalus/elements/map_tile'
 
 require 'dedalus/pattern_library'

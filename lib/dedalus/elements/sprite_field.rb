@@ -78,7 +78,7 @@ module Dedalus
           tiles_path: "media/images/tiles.png",
           tile_width: 64,
           tile_height: 64,
-          tile_class: "Dedalus::Elements::Sprite",
+          tile_class: "Dedalus::Elements::MapTile",
           sprite_map: {
             [1.2,2.4] => [ Sprite.new(Sprite.example_data) ]
           }

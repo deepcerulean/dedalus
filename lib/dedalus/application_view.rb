@@ -11,7 +11,11 @@ module Dedalus
 
     def click
       p [ :app_view_click ]
-      composer.click_molecule(app_screen, [window.width, window.height], mouse_position: mouse_position)
+      composer.click_molecule(
+        app_screen,
+        [window.width, window.height],
+        mouse_position: mouse_position
+      )
     end
 
     def compose(screen)
