@@ -7,6 +7,10 @@ module Dedalus
         @asset ||= Dedalus::ImageRepository.lookup_tiles(path, asset_width, asset_height)[frame]
       end
 
+      def scale
+        @scale ||= 1.0
+      end
+
       def width
         2*padding + (asset_width * scale)
       end

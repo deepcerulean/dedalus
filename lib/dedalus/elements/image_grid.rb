@@ -24,13 +24,17 @@ module Dedalus
         @name ||= 'an-image-grid' # a uniq id for recording
       end
 
+      def scale
+        @scale ||= 1.0
+      end
+
       def record?
         !grid.empty?
       end
 
       def width
         if grid && grid.first
-          grid.first.length * tile_height * scale
+          grid.first.length * tile_width * scale
         else
           0
         end
