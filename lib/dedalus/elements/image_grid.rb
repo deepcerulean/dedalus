@@ -1,7 +1,7 @@
 module Dedalus
   module Elements
     class ImageGrid < Dedalus::Molecule
-      attr_accessor :grid, :tiles_path, :tile_width, :tile_height
+      attr_accessor :grid, :tiles_path, :tile_width, :tile_height, :tile_class
       attr_accessor :scale
 
       def show
@@ -49,7 +49,7 @@ module Dedalus
       end
 
       def sprite_for(frame)
-        Sprite.new(
+        tile_class.constantize.new(
           frame: frame,
           asset_width: tile_width,
           asset_height: tile_height,
@@ -71,6 +71,7 @@ module Dedalus
           tiles_path: "media/images/tiles.png",
           tile_width: 64,
           tile_height: 64,
+          tile_class: "Dedalus::Elements::Sprite",
           scale: 0.2,
           grid: [
             [ nil, 0, 2, 0, 1 ],

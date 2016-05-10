@@ -2,7 +2,7 @@ module Dedalus
   module Elements
     class SpriteField < Dedalus::Organism
       attr_accessor :grid, :sprite_map, :scale, :camera_location
-      attr_accessor :tile_width, :tile_height, :tiles_path
+      attr_accessor :tile_width, :tile_height, :tiles_path, :tile_class
 
       def show
         layers
@@ -45,6 +45,7 @@ module Dedalus
           grid: grid,
           tile_width: tile_width,
           tile_height: tile_height,
+          tile_class: tile_class,
           scale: scale,
           offset: camera_offset,
           name: 'sprite-field-tiles'
@@ -77,6 +78,7 @@ module Dedalus
           tiles_path: "media/images/tiles.png",
           tile_width: 64,
           tile_height: 64,
+          tile_class: "Dedalus::Elements::Sprite",
           sprite_map: {
             [1.2,2.4] => [ Sprite.new(Sprite.example_data) ]
           }

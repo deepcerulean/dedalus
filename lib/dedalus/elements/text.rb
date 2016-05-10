@@ -5,7 +5,7 @@ module Dedalus
 
       def render(*)
         x,y = *position
-        font.draw(text, x + padding, y + padding, ZOrder::Text, self.scale, self.scale)
+        font.draw(text, x + padding, y + padding, z_order, self.scale, self.scale)
 
         # draw_bounding_box(origin: [x,y], dimensions: dimensions)
       end

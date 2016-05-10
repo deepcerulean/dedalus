@@ -4,11 +4,16 @@ module Dedalus
       attr_accessor :icon, :name, :description, :scale, :highlight, :section_color
 
       def show
-        Container.new([[icon_element, [ title_element, description_element ]]], padding: 16)
+        Container.new(
+          [[icon_element, [ title_element, description_element ]]],
+          padding: 16,
+          scale: scale
+        )
       end
 
       def hover
-        @scale = 0.2
+        p [ :hover_section_tab, name: name ]
+        self.scale = 1.2
       end
 
       def background_color
@@ -21,7 +26,7 @@ module Dedalus
       end
 
       def scale
-        @scale ||= 0.0
+        @scale ||= 1.0
       end
 
       def height
@@ -33,7 +38,7 @@ module Dedalus
       end
 
       def title_element
-        Elements::Heading.new(text: name)
+        Elements::Heading.new(text: name, scale: scale)
       end
 
       def description_element

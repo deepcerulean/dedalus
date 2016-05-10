@@ -9,6 +9,7 @@ require 'dedalus/application_view'
 
 require 'dedalus/palette'
 require 'dedalus/image_repository'
+require 'dedalus/font_repository'
 
 require 'dedalus/elements'
 require 'dedalus/elements/void'

@@ -31,9 +31,9 @@ module Dedalus
         [ ox, oy ]
       end
 
-      def z_order
-        @z_order ||= ZOrder::Foreground
-      end
+      # def z_order
+      #   @z_order ||= ZOrder::Foreground
+      # end
 
       def width
         2*padding + (asset.width * scale)

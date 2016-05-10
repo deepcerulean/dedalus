@@ -7,15 +7,6 @@ module Dedalus
     @active_view ||= nil
   end
 
-  class FontRepository
-    def self.get_font(font_name='Helvetica',size: 20)
-      @fonts ||= {}
-      @fonts[font_name] ||= {}
-      @fonts[font_name][size] ||= Gosu::Font.new(size, name: font_name)
-      @fonts[font_name][size]
-    end
-  end
-
   class Element
     attr_accessor :position, :offset
 
@@ -28,8 +19,15 @@ module Dedalus
     attr_accessor :padding, :margin
     attr_accessor :color, :background_color
 
+    attr_accessor :z_order #index
+
     def initialize(attrs={})
       attrs.each { |(k,v)| instance_variable_set(:"@#{k}",v) } unless attrs.nil?
+    end
+
+    attr_accessor :shown
+    def shown
+      @shown ||= show
     end
 
     def record?
@@ -46,7 +44,7 @@ module Dedalus
       window.draw_quad(x,   y,   c,
                        x,   y+h, c,
                        x+w, y,   c,
-                       x+w, y+h, c,ZOrder::Background)
+                       x+w, y+h, c, ZOrder::Background)
     end
 
     def view
@@ -103,6 +101,8 @@ module Dedalus
   # maybe should also pull out rows and columns?
   # could cleanup traversal impl, and will be clearer ultimately
   class Layer < Element
+    attr_accessor :elements
+
     def initialize(elements, freeform: false)
       @elements = elements
       @freeform = freeform
@@ -118,7 +118,7 @@ module Dedalus
   end
 
   class LayerStack < Element
-    attr_reader :layers
+    attr_accessor :layers
 
     def initialize(layers: [])
       @layers = []

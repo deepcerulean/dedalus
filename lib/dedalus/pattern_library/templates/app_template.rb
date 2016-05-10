@@ -78,21 +78,22 @@ module Dedalus
       end
 
       def sidebar
-        ApplicationSidebar.new(
-          library_section_tab_molecules: section_tabs,
+        @sidebar ||= ApplicationSidebar.new(
+          library_section_tabs: library_section_tabs, #_molecules: section_tabs,
           width_percent: 0.2,
+          current_entry: current_entry_name,
           background_color: Palette.decode_color('darkgray')
         )
       end
 
-      def section_tabs
-        tab_list = library_section_tabs.map do |attrs|
-          highlight = attrs[:name] == current_entry_name
-          LibrarySectionTab.new(attrs.merge(highlight: highlight))
-        end
-        # p [ tab_list: tab_list ]
-        tab_list
-      end
+      # def section_tabs
+      #   tab_list = library_section_tabs.map do |attrs|
+      #     highlight = attrs[:name] == current_entry_name
+      #     LibrarySectionTab.new(attrs.merge(highlight: highlight))
+      #   end
+      #   # p [ tab_list: tab_list ]
+      #   tab_list
+      # end
     end
   end
 end

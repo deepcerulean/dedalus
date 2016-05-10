@@ -5,22 +5,26 @@ module Dedalus
 
     def traverse(structure, origin: [0,0], dimensions:, render: false, &blk)
       traversal = ViewTraversal.new(&blk)
-      traversal.walk!(structure, origin: origin, dimensions: dimensions, render: render)
+      structure = traversal.walk!(structure, origin: origin, dimensions: dimensions, render: render)
       structure
     end
 
     def send_molecule(structure, window_dims, mouse_position:, message:)
       mouse_coord = coord(*mouse_position)
 
-      traverse(structure, origin: [0,0], dimensions: window_dims) do
-        on_molecule do |molecule, origin:, dimensions:|
+      updated_structure = traverse(structure, origin: [0,0], dimensions: window_dims) do
+        on_molecule do |molecule, origin:, dimensions:, z_index:|
           element_bounding_box = Geometer::Rectangle.new(coord(*origin), dim(*dimensions))
           mouse_overlap = element_bounding_box.contains?(mouse_coord) rescue false # could get bad coords...
           if mouse_overlap
             molecule.send(message)
           end
+
+          molecule
         end
       end
+
+      updated_structure
     end
 
     def hover_molecule(structure, window_dims, mouse_position:)
@@ -33,7 +37,7 @@ module Dedalus
 
     def render!(structure, dims)
       traverse(structure, origin: [0,0], dimensions: dims, render: true) do
-        on_atom do |atom, origin:, dimensions:, freeform:|
+        on_atom do |atom, origin:, dimensions:, freeform:, z_index:|
           if atom.background_color
             atom.draw_bounding_box(
               color: atom.background_color,
@@ -50,10 +54,12 @@ module Dedalus
             atom.position = origin
           end
 
+          atom.z_order = z_index
+
           atom.render
         end
 
-        on_element do |element, origin:, dimensions:|
+        on_element do |element, origin:, dimensions:, z_index:|
           if element.background_color
             element.draw_bounding_box(
               color: element.background_color,

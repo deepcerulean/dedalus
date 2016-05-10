@@ -19,7 +19,7 @@ module Dedalus
       @element_callback = blk
     end
 
-    def walk!(structure, origin:, dimensions:, freeform: false, render: false)
+    def walk!(structure, origin:, dimensions:, freeform: false, render: false, z_index: ZOrder::Background)
       width, height = *dimensions
 
       height = structure.height if !structure.is_a?(Array) && structure.height
@@ -28,11 +28,11 @@ module Dedalus
       x0, y0 = *origin
 
       if structure.is_a?(Dedalus::Atom)
-        @atom_callback.call(structure, origin: origin, dimensions: dimensions, freeform: freeform) if @atom_callback
+        @atom_callback.call(structure, origin: origin, dimensions: dimensions, freeform: freeform, z_index: z_index) if @atom_callback
 
       # implicitly array is rows, nested arrays are columns, doubly-nested arrays are rows, etc
       elsif structure.is_a?(Array)
-        walk_rows!(structure, origin: origin, dimensions: dimensions, render: render)
+        structure = walk_rows!(structure, origin: origin, dimensions: dimensions, render: render)
 
       elsif structure.is_a?(Dedalus::Element)
         offset = structure.offset || [0,0]
@@ -46,11 +46,11 @@ module Dedalus
         margin_dims = [ width - margin*2, height - margin*2 ]
 
         if structure.is_a?(Dedalus::Molecule) && @molecule_callback
-          @molecule_callback.call(structure, origin: margin_origin, dimensions: margin_dims)
+          structure = @molecule_callback.call(structure, origin: margin_origin, dimensions: margin_dims, z_index: z_index)
         end
 
         if @element_callback
-          @element_callback.call(structure, origin: margin_origin, dimensions: margin_dims)
+          @element_callback.call(structure, origin: margin_origin, dimensions: margin_dims, z_index: z_index)
         end
 
         pad = structure.padding || 0.0
@@ -58,34 +58,42 @@ module Dedalus
         pad_dims = [width - pad*2 - margin*2, height - pad*2 - margin*2 ]
 
         if structure.is_a?(LayerStack)
-          layers = structure.layers
-          layers.each do |layer|
+          # layers = structure.layers
+          structure.shown = structure.layers.map! do |layer|
             if layer.freeform?
-              if layer.show.is_a?(Array)
-                layer.show.each do |layer_element|
-                  walk!(layer_element, origin: pad_origin, dimensions: pad_dims, freeform: true, render: render)
+              if layer.shown.is_a?(Array)
+                layer.shown = layer.elements.map.with_index(1) do |layer_element, z_offset|
+                  walk!(layer_element, origin: pad_origin, dimensions: pad_dims, freeform: true, render: render, z_index: z_index+z_offset)
                 end
               else
-                walk!(layer, origin: pad_origin, dimensions: pad_dims, freeform: true, render: render)
+                layer.shown = walk!(layer.elements, origin: pad_origin, dimensions: pad_dims, freeform: true, render: render, z_index: z_index)
               end
             else
-              walk!(layer, origin: pad_origin, dimensions: pad_dims, freeform: false, render: render)
+              layer.shown = walk!(layer.elements, origin: pad_origin, dimensions: pad_dims, freeform: false, render: render, z_index: z_index)
             end
+
+            layer
           end
         else
           if structure.record? && render
             recorded_image = ImageRepository.lookup_recording(structure.name, structure.width, structure.height, structure.window) do
-              walk!(structure.show, origin: [0,0], dimensions: pad_dims, freeform: freeform, render: render)
+              walk!(structure.shown, origin: [0,0], dimensions: pad_dims, freeform: freeform, render: render)
             end
 
             ox,oy = *pad_origin
-            recorded_image.draw(ox,oy,10)
+            recorded_image.draw(ox,oy,z_index)
+            # structure = walk!(structure.show, origin: [0,0], dimensions: pad_dims, freeform: freeform, render: false)
           else
-            walk!(structure.show, origin: pad_origin, dimensions: pad_dims, freeform: freeform, render: render)
+            # structure = 
+            structure.shown = walk!(structure.shown, origin: pad_origin, dimensions: pad_dims, freeform: freeform, render: render, z_index: z_index)
           end
         end
 
+        # structure
       end
+
+      # p [ structure: structure ]
+      structure #.shown
     end
 
     private
@@ -97,19 +105,21 @@ module Dedalus
         y = y0 + height_cursor
         dims = [width, current_row_height]
         if row.is_a?(Array)
-          extra_columns = true
-          while extra_columns
-            row = walk_columns!(row, origin: [x0, y], dimensions: dims, render: render)
-            if row.empty?
-              extra_columns = false
-            else
-              height_cursor += row.first.height
-              y = y0 + height_cursor
-            end
-          end
+          #extra_columns = true
+          #while extra_columns
+          walk_columns!(row, origin: [x0, y], dimensions: dims, render: render)
+          #   if row.empty? && !row
+          #     extra_columns = false
+          #   else
+          #     height_cursor += row.first.height
+          #     y = y0 + height_cursor
+          #   end
+          # end
         else
           walk!(row, origin: [x0,y], dimensions: dims, render: render)
         end
+
+        # row
       end
     end
 
@@ -121,6 +131,7 @@ module Dedalus
         x = x0 + width_cursor
         dims = [ current_column_width, height ]
         walk!(column, origin: [x,y0], dimensions: dims, render: render)
+        column
       end
     end
 
@@ -152,7 +163,7 @@ module Dedalus
       end
 
       distance_cursor = 0
-      elements.each_with_index do |element, index|
+      elements.map.with_index(1) do |element, index|
         current_element_distance = if element.is_a?(Array)
           default_element_section_distance
         else
@@ -165,15 +176,20 @@ module Dedalus
           end
         end
 
-        if distance_cursor > distance - current_element_distance
-          return elements.slice(index,elements.size)
-        end
+        # TODO bring back flow... maybe with custom 'flex' containers?
+        # if distance_cursor > distance - current_element_distance
+        #   # !!! this makes things awkward !!!
+        #   return elements.slice(index,elements.size)
+        # end
 
-        yield(element, current_element_distance, distance_cursor)
+        element = yield(element, current_element_distance, distance_cursor)
         distance_cursor += current_element_distance
+        element
       end
 
-      []
+      # p [ elements: elements ]
+      # elements
+      # []
     end
   end
 end
