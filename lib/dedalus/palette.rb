@@ -31,8 +31,12 @@ module Dedalus
   end
 
   class ColorPalette
-    attr_accessor :red, :green, :blue, :yellow, :purple, :gray, :white
-    def initialize(red:, green:, blue:, yellow:, purple:, gray:, white: Color.new(240,240,240))
+    attr_accessor :red, :green, :blue, :yellow, :purple, :gray, :white, :black
+    def initialize(
+      red:, green:, blue:, yellow:, purple:, gray:, 
+      white: Color.new(240,240,240),
+      black: Color.new(20,20,20)
+    )
       @red = red
       @green = green
       @blue = blue
@@ -40,6 +44,7 @@ module Dedalus
       @purple = purple
       @gray = gray
       @white = white
+      @black = black
     end
 
     def decode_color(color)
@@ -69,6 +74,9 @@ module Dedalus
       when 'purple' then purple
       when 'lightpurple' then purple.lighten
       when 'darkpurple' then purple.darken
+
+      when 'white' then white
+      when 'black' then black
 
       else 
         raise "Unknown color string given to #{self.class.name}#decode_color: #{color}"
