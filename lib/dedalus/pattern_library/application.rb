@@ -4,8 +4,8 @@ module Dedalus
       viewed_with ApplicationView
       include Models
 
+      # TODO move into joyce??
       def click
-        p [ :app_click ]
         view.click
       end
 

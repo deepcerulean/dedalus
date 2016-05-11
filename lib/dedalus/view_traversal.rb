@@ -73,7 +73,7 @@ module Dedalus
           end
         else
           if structure.record? && render
-            recorded_image = ImageRepository.lookup_recording(structure.name, structure.width, structure.height, structure.window) do
+            recorded_image = ImageRepository.lookup_recording(structure.name, structure.width, structure.height, structure.window, force: structure.rerecord?) do
               walk!(structure.shown, origin: [0,0], dimensions: pad_dims, freeform: freeform, render: render)
             end
 

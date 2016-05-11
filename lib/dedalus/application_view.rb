@@ -10,7 +10,6 @@ module Dedalus
     end
 
     def click
-      p [ :app_view_click ]
       composer.click_molecule(
         app_screen,
         [window.width, window.height],
@@ -20,7 +19,7 @@ module Dedalus
 
     def compose(screen)
       composer.hover_molecule(screen, dimensions, mouse_position: mouse_position)
-      composer.render!(screen.shown, dimensions)
+      composer.render!(screen, dimensions)
     end
 
     def dimensions

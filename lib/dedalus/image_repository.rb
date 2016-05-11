@@ -12,10 +12,14 @@ module Dedalus
       @tiles[path]
     end
 
-    def self.lookup_recording(id,width,height,window,&blk)
+    def self.lookup_recording(id,width,height,window,force:false,&blk)
       # p [ :lookup_recording, id: id ]
       @recordings ||= {}
-      @recordings[id] ||= window.record(width.to_i,height.to_i,&blk)
+      if force
+        @recordings[id] = window.record(width.to_i,height.to_i,&blk)
+      else
+        @recordings[id] ||= window.record(width.to_i,height.to_i,&blk)
+      end
       @recordings[id]
     end
 

@@ -2,7 +2,7 @@ module Dedalus
   module Elements
     class ImageGrid < Dedalus::Molecule
       attr_accessor :grid, :tiles_path, :tile_width, :tile_height, :tile_class
-      attr_accessor :scale
+      attr_accessor :scale, :redraw_tiles
 
       def show
         if grid
@@ -29,7 +29,11 @@ module Dedalus
       end
 
       def record?
-        grid && !grid.empty?
+        (grid && !grid.empty?)
+      end
+
+      def rerecord?
+        redraw_tiles
       end
 
       def width

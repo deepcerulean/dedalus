@@ -5,14 +5,13 @@ module Dedalus
 
     def traverse(structure, origin: [0,0], dimensions:, render: false, &blk)
       traversal = ViewTraversal.new(&blk)
-      structure = traversal.walk!(structure, origin: origin, dimensions: dimensions, render: render)
-      structure
+      traversal.walk!(structure, origin: origin, dimensions: dimensions, render: render)
     end
 
     def send_molecule(structure, window_dims, mouse_position:, message:)
       mouse_coord = coord(*mouse_position)
 
-      updated_structure = traverse(structure, origin: [0,0], dimensions: window_dims) do
+      traverse(structure, origin: [0,0], dimensions: window_dims, render: false) do
         on_molecule do |molecule, origin:, dimensions:, z_index:|
           element_bounding_box = Geometer::Rectangle.new(coord(*origin), dim(*dimensions))
           mouse_overlap = element_bounding_box.contains?(mouse_coord) rescue false # could get bad coords...
@@ -20,12 +19,8 @@ module Dedalus
             molecule.position = origin
             molecule.send(message)
           end
-
-          molecule
         end
       end
-
-      updated_structure
     end
 
     def hover_molecule(structure, window_dims, mouse_position:)
@@ -47,7 +42,8 @@ module Dedalus
             )
           end
 
-          if freeform # then offset by origin
+          # TODO may need to do this to get click/hover events for sprites?
+          if freeform # then offset by origin 
             x0,y0 = *origin
             x,y = *atom.position
             atom.position = [x+x0,y+y0]

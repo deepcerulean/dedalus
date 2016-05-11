@@ -3,6 +3,7 @@ module Dedalus
     class SpriteField < Dedalus::Organism
       attr_accessor :grid, :sprite_map, :scale, :camera_location
       attr_accessor :tile_width, :tile_height, :tiles_path, :tile_class
+      attr_accessor :redraw_tiles
 
       def show
         layers
@@ -48,7 +49,8 @@ module Dedalus
           tile_class: tile_class,
           scale: scale,
           offset: camera_offset,
-          name: 'sprite-field-tiles'
+          name: 'sprite-field-tiles',
+          redraw_tiles: redraw_tiles
         )
       end
 
