@@ -20,7 +20,7 @@ module Dedalus
 
       def layers
         layer_stack = Dedalus::LayerStack.new
-        layer_stack.push(Dedalus::Layer.new(background_image))
+        layer_stack.push(Dedalus::Layer.new(background_image)) if background_image
         layer_stack.push(Dedalus::Layer.new(image_grid))
         layer_stack.push(canvas_layer)
         layer_stack
@@ -62,7 +62,7 @@ module Dedalus
       end
 
       def background_image
-        Image.new(path: "media/images/cosmos.jpg", z_order: -1)
+        @background_image ||= nil
       end
 
       def self.description

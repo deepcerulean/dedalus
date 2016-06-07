@@ -84,6 +84,11 @@ module Dedalus
           end
         end
       end
+    rescue => ex
+      puts "ERROR: Encountered an error with structure of type #{structure.class.name}"
+      p ex.message
+      p ex.backtrace
+      raise ex
     end
 
     private

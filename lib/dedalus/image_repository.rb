@@ -13,7 +13,6 @@ module Dedalus
     end
 
     def self.lookup_recording(id,width,height,window,force:false,&blk)
-      # p [ :lookup_recording, id: id ]
       @recordings ||= {}
       if force
         @recordings[id] = window.record(width.to_i,height.to_i,&blk)
@@ -22,12 +21,5 @@ module Dedalus
       end
       @recordings[id]
     end
-
-    # TODO could handle overflows/alignment in text (should use for code...?)
-    # def self.lookup_text(text, line_height)
-    #   @text_images ||= {}
-    #   @text_images[text] ||= Gosu::Image.from_text(text, line_height)
-    #   @text_images[text]
-    # end
   end
 end
